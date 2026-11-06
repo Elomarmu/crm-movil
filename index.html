@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CRM Grupo Trimodos</title>
+<meta name="description" content="CRM comercial de STINSA y TRANSARGI sobre Odoo y Outlook">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CRM">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;700;800&family=Mulish:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: imagen corporativa de Grupo Trimodos (como la calculadora del gasóleo): franja blanca con logotipos y raya tricolor
+   (amarillo Trimodos, verde STINSA, naranja TRANSARGI), barra de título fija, contenido en una columna, cifras clave en negro
+   con rótulos amarillos y barra inferior con el botón + en amarillo. El color de acento sigue a la empresa elegida. */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --sunk:#eceee9; --ink:#1d1d1b; --muted:#5f625c; --line:#dcdfd8;
+  --accent:#00857a; --accent-ink:#ffffff; --accent-soft:#d9efec;
+  --sun:#fcda00; --dark:#1d1d1b; --dark-ink:#ffffff; --dark-muted:#c9cac4; --dark-good:#5cc98d; --dark-bad:#f08a80;
+  --warn:#a85d00; --warn-soft:#fdebd3; --bad:#b3261e; --bad-soft:#fadcd9; --good:#1f7a4a; --good-soft:#dcf1e5;
+  --f-display:"Raleway","Segoe UI",system-ui,sans-serif;
+  --f-body:"Mulish",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f0f0e; --surface:#191918; --sunk:#222220; --ink:#f1f1ee; --muted:#a9aba5; --line:#2f2f2c;
+  --accent:#2cc4b5; --accent-ink:#0f0f0e; --accent-soft:#12312d;
+  --dark:#232321; --dark-ink:#ffffff; --dark-muted:#c9cac4;
+  --warn:#f0a050; --warn-soft:#3b2814; --bad:#f08a80; --bad-soft:#3d1c1a; --good:#5cc98d; --good-soft:#163828; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f0f0e; --surface:#191918; --sunk:#222220; --ink:#f1f1ee; --muted:#a9aba5; --line:#2f2f2c;
+  --accent:#2cc4b5; --accent-ink:#0f0f0e; --accent-soft:#12312d;
+  --dark:#232321; --dark-ink:#ffffff; --dark-muted:#c9cac4;
+  --warn:#f0a050; --warn-soft:#3b2814; --bad:#f08a80; --bad-soft:#3d1c1a; --good:#5cc98d; --good-soft:#163828; color-scheme:dark}
+/* TRANSARGI: acento naranja */
+:root[data-emp="TRANSARGI"]{--accent:#c4592a; --accent-soft:#fde6da}
+@media (prefers-color-scheme: dark){:root[data-emp="TRANSARGI"]:not([data-theme="light"]){--accent:#f5925f; --accent-soft:#3d2417}}
+:root[data-theme="dark"][data-emp="TRANSARGI"]{--accent:#f5925f; --accent-soft:#3d2417}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 10px;
+  display:flex;align-items:center;gap:10px;border-bottom:1px solid transparent}
+.top.scrolled{border-bottom-color:var(--line)}
+.top{flex-wrap:wrap}
+.top h1{font-family:var(--f-display);font-weight:750;font-size:22px;letter-spacing:-.01em;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+.iconbtn svg{width:20px;height:20px}
+
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:4px 120px;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.sec{display:flex;flex-direction:column;gap:10px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.eyebrow{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.link{background:none;border:0;padding:0;color:var(--accent);font-weight:600;font-size:14px}
+
+.banner{border-radius:var(--r);padding:10px 12px;background:var(--warn-soft);color:var(--ink);font-size:13.5px}
+.banner b{color:var(--warn)}
+
+/* Hoy: contador de acciones */
+.tally{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tally button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.tally .n{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1}
+.tally .l{font-size:12.5px;color:var(--muted)}
+.tally .bad .n{color:var(--bad)}
+.tally .warn .n{color:var(--warn)}
+
+/* Filas de lista */
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.row{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-top:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left}
+.row:first-child{border-top:0}
+.row .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row .t{font-weight:600;overflow-wrap:anywhere}
+.row .s{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.row .end{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:13px}
+.empty{padding:16px 14px;color:var(--muted);font-size:14px}
+
+.check{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;margin-top:1px;padding:0}
+.check.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.check svg{width:14px;height:14px}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.acc{background:var(--accent-soft);color:var(--accent)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+.avatar{flex:none;width:40px;height:40px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:15px;letter-spacing:.02em}
+
+/* Buscador y chips */
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0 12px}
+.search input{border:0;background:none;outline:0;padding:11px 0;flex:1;min-width:0}
+.search svg{width:18px;height:18px;color:var(--muted);flex:none}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -2px;padding:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:500;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* Ficha */
+.hero{display:flex;flex-direction:column;gap:12px}
+.hero-id{display:flex;gap:12px;align-items:center}
+.hero-id .avatar{width:52px;height:52px;font-size:19px;border-radius:13px}
+.hero h2{font-family:var(--f-display);font-weight:800;font-size:25px;line-height:1.08;margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.hero .meta{font-size:13.5px;color:var(--muted)}
+.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.quick a,.quick button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--ink);text-decoration:none}
+.quick svg{width:20px;height:20px;color:var(--accent)}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-family:var(--f-display);font-weight:750;font-size:22px;line-height:1.1;letter-spacing:-.01em;overflow-wrap:anywhere}
+.kpi .d{font-size:12px;font-weight:600}
+.kpi.lead{grid-column:1/-1;flex-direction:row;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.kpi.lead .v{font-size:32px}
+.up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)}
+.chartbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 8px}
+.chartbox svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+.health{display:flex;gap:10px;align-items:flex-start;border-radius:var(--r);padding:11px 12px;font-size:13.5px}
+.health.good{background:var(--good-soft)} .health.warn{background:var(--warn-soft)} .health.bad{background:var(--bad-soft)}
+.health b{display:block;font-size:14px}
+.health ul{margin:4px 0 0;padding-left:18px}
+
+.custom{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.persel{display:flex;flex-direction:column;gap:4px}
+.persel select{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;width:100%;font-size:15px;font-weight:600;color:var(--ink)}
+.custom .cf{display:flex;flex-direction:column;gap:4px;min-width:0}
+.custom select{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 9px;min-width:0;width:100%;font-size:15px}
+
+.tabs{display:flex;border-bottom:1px solid var(--line);gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 10px 9px;font-weight:600;font-size:14px;color:var(--muted)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .c{font-weight:500;color:var(--muted);margin-left:3px}
+
+.timeline{display:flex;flex-direction:column}
+.tl{display:grid;grid-template-columns:54px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.tl:first-child{border-top:0}
+.tl .date{font-family:var(--f-display);text-align:center;line-height:1.05}
+.tl .date b{display:block;font-size:22px;font-weight:800}
+.tl .date span{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tl .body{min-width:0;display:flex;flex-direction:column;gap:4px}
+.tl .body p{margin:0;font-size:14px;overflow-wrap:anywhere}
+.tl .body .res{font-size:13px;color:var(--muted)}
+
+.stage{display:flex;gap:3px;margin-top:4px}
+.stage i{flex:1;height:4px;border-radius:2px;background:var(--sunk)}
+.stage i.on{background:var(--accent)}
+
+.facts{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:14px}
+.facts dt{color:var(--muted);font-size:13px}
+.facts dd{margin:0;overflow-wrap:anywhere;user-select:text}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:6px 10px;font-size:13px;border-radius:8px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+.ctx{flex-basis:100%;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.seg2{display:flex;background:var(--sunk);border-radius:10px;padding:3px;gap:2px}
+.seg2 button{border:0;background:none;border-radius:8px;padding:6px 14px;font-family:var(--f-display);font-weight:750;font-size:13.5px;letter-spacing:.04em;color:var(--muted)}
+.seg2 button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+.empfix{font-family:var(--f-display);font-weight:800;font-size:13px;letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);padding:5px 10px;border-radius:8px}
+.iconbtn.sm{width:34px;height:34px;font-size:17px;font-weight:700;color:var(--muted)}
+.who{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 8px;min-width:0;max-width:60%}
+.who svg{width:16px;height:16px;color:var(--muted);flex:none}
+.who select{border:0;background:none;padding:7px 0;font-size:13.5px;font-weight:600;min-width:0;max-width:100%}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* Franja de marca (siempre blanca, como la calculadora) */
+.brand{background:#ffffff;border-bottom:5px solid;border-image:linear-gradient(90deg,#fcda00 0 33.34%,#009f92 0 66.67%,#f17e49 0) 1}
+.brand-in{max-width:640px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand .gt{height:30px;width:auto;display:block}
+.brand .alt{font-family:var(--f-display);font-weight:800;color:#1d1d1b;font-size:15px;letter-spacing:.04em}
+.brand .units{display:flex;align-items:center;gap:4px}
+.brand .units button,.brand .units span.logo{border:0;background:#fff;padding:6px 6px 4px;border-bottom:3px solid transparent;border-radius:0;display:grid;place-items:center}
+.brand .units img{height:22px;width:auto;display:block}
+.brand .units button[aria-pressed="false"] img{filter:grayscale(1);opacity:.4}
+.brand .units button[aria-pressed="false"] .alt{color:#9a9c97}
+.brand .units button[data-emp="STINSA"][aria-pressed="true"]{border-bottom-color:#009f92}
+.brand .units button[data-emp="TRANSARGI"][aria-pressed="true"]{border-bottom-color:#f17e49}
+.brand .units button:focus-visible{outline:2px solid #00857a;outline-offset:-2px}
+@media (max-width:380px){.brand .gt{height:26px}.brand .units img{height:19px}}
+.top h1{font-weight:800;letter-spacing:-.005em}
+.eyebrow{font-family:var(--f-display);color:var(--accent);letter-spacing:.12em}
+.empchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-family:var(--f-display);font-weight:800;font-size:12.5px;letter-spacing:.1em;color:var(--ink)}
+.empchip i{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.tally .n,.kpi .v,.tl .date b{font-family:var(--f-mono);font-weight:500;letter-spacing:-.01em}
+.kpi .v{font-size:21px}
+.kpi.lead{background:var(--dark);color:var(--dark-ink);border:0;border-top:5px solid var(--sun)}
+.kpi.lead .l{color:var(--sun);font-family:var(--f-display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px}
+.kpi.lead .v{font-family:var(--f-display);font-weight:800;font-size:34px}
+.kpi.lead .up{color:var(--dark-good)} .kpi.lead .down{color:var(--dark-bad)} .kpi.lead .flat{color:var(--dark-muted)}
+.kpi.lead .vs{font-size:12px;color:var(--dark-muted)}
+.kpi.lead .v.num{font-family:var(--f-display)}
+.tally button:first-child{border-top:4px solid var(--bad)}
+.tally button:nth-child(2){border-top:4px solid var(--sun)}
+.tally button:nth-child(3){border-top:4px solid var(--accent)}
+.btn{font-weight:700}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg input:checked+span{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+/* Barra inferior */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);
+  padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));
+  display:grid;grid-template-columns:repeat(5,1fr);align-items:end}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--muted);padding:4px 0;position:relative}
+.nav button svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--accent)}
+.nav .plus{width:52px;height:52px;border-radius:50%;background:var(--sun);color:#1d1d1b;display:grid;place-items:center;margin:-18px auto 0;box-shadow:0 4px 14px rgb(0 0 0 / .18)}
+.nav .plus svg{width:26px;height:26px}
+.badge{position:absolute;top:0;left:calc(50% + 6px);background:var(--bad);color:var(--surface);border-radius:999px;font-size:10.5px;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;font-weight:700}
+
+/* Hoja inferior (formularios) */
+.scrim{position:fixed;inset:0;background:rgb(0 0 0 / .4);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:18px 18px 0 0;max-height:92%;overflow-y:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:8px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 10px}
+.sheet h3{font-family:var(--f-display);font-weight:800;font-size:21px;margin:0 0 12px}
+.sheet-inner{max-width:600px;margin:0 auto}
+.choose{display:grid;gap:8px}
+.choose button,.choose a{color:var(--ink);text-decoration:none;display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.choose svg{width:22px;height:22px;color:var(--accent);flex:none}
+.choose b{display:block}
+.evt{flex:none;width:46px;font-size:12.5px;font-weight:600;line-height:1.25;color:var(--accent);padding-top:1px}
+.choose span{font-size:13px;color:var(--muted)}
+form.f{display:flex;flex-direction:column;gap:12px}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld label{font-size:13px;font-weight:600;color:var(--muted)}
+.fld input,.fld select,.fld textarea{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 11px;width:100%;min-width:0}
+.fld textarea{min-height:84px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13.5px}
+.seg input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+fieldset{border:1px dashed var(--line);border-radius:var(--r);padding:10px 12px 12px;margin:0;display:flex;flex-direction:column;gap:10px}
+legend{font-size:13px;font-weight:600;color:var(--muted);padding:0 4px}
+.err{color:var(--bad);font-size:13px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:14px;font-weight:500;max-width:calc(100% - 32px)}
+
+.state{display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:28px 4px}
+.state h2{font-family:var(--f-display);font-weight:800;font-size:24px;margin:0;text-wrap:balance}
+.state p{margin:0;color:var(--muted);max-width:46ch}
+.skel{height:64px;border-radius:var(--r);background:var(--sunk)}
+@media (prefers-reduced-motion:no-preference){.skel{animation:pulse 1.4s ease-in-out infinite}.sheet{animation:up .2s ease-out}}
+@keyframes pulse{50%{opacity:.55}}
+@keyframes up{from{transform:translateY(24px);opacity:.6}}
+
+/* App instalable: cabecera fija (franja de marca + barra de título) */
+html,body{margin:0}
+body::before{display:none}
+.head{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
+.head .top{position:relative;top:auto}
+.brand .units span.logo{border-bottom:3px solid transparent;cursor:default}
+:root[data-emp="STINSA"] .brand .units span.logo{border-bottom-color:#009f92}
+:root[data-emp="TRANSARGI"] .brand .units span.logo{border-bottom-color:#f17e49}
+/* Hoja inferior: se cierra deslizando hacia abajo o con la X */
+.sheet{touch-action:pan-y;overscroll-behavior:contain}
+.sheet.back{transition:transform .2s ease-out}
+.sh-top{position:sticky;top:-8px;z-index:2;background:var(--bg);height:34px;margin:-8px 0 6px;padding-top:8px;touch-action:none}
+.sh-top .grab{width:44px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 0}
+.sh-x{position:absolute;right:0;top:6px;width:32px;height:32px;border-radius:50%;border:0;background:var(--sunk);color:var(--muted);display:grid;place-items:center;font-size:20px;line-height:1;padding:0}
+.sh-x svg{width:16px;height:16px}
+body.lock{overflow:hidden}
+/* Indicadores bajo demanda */
+.ondemand{display:flex;flex-direction:column;gap:10px;align-items:flex-start;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:14px}
+.ondemand p{margin:0;color:var(--muted);font-size:14px}
+/* Pantalla de entrada */
+.login{min-height:60vh;justify-content:center}
+.ms{display:inline-flex;align-items:center;gap:10px}
+.ms i{display:grid;grid-template-columns:8px 8px;gap:2px}
+.ms i b{width:8px;height:8px;display:block}
+</style>
+</head>
+<body>
+
+<div class="head" id="head"><div class="brand" id="brand"></div><header class="top" id="top"></header></div>
+<main id="app"><div class="skel"></div><div class="skel"></div><div class="skel"></div></main>
+<nav class="nav" id="nav" aria-label="Secciones"></nav>
+<div id="layer"></div>
+
+<script src="config.js"></script>
+<script src="vendor/msal-browser.min.js"></script>
+<script>
+(function(){
+"use strict";
+// ---------- Estado ----------
+const VER="2026.11.07";
+const CONF=window.CRM_CONFIG||{};
+const CFG={empresas:["STINSA","TRANSARGI"],fixed:null,appName:"CRM comercial"};
+let savedEmp="";try{savedEmp=localStorage.getItem("crm.emp")||""}catch(e){}
+const S={cl:[],re:[],ac:[],op:[],kp:{},RAW:{cl:[],re:[],ac:[],op:[]},me:null,names:{},comerciales:[],cart:{},kpState:{},od:{state:"idle",msg:""},meName:"",
+  emp:CFG.fixed||(CFG.empresas.includes(savedEmp)?savedEmp:CFG.empresas[0]),quien:"todos",view:"hoy",cid:null,per:"12m",cFrom:"",cTo:"",tab:"acciones",q:"",sort:"accion",agTab:"p",sheet:null,
+  ol:{state:"off",events:[],msg:""},graph:false,auth:{state:"init",msg:""},kpPedido:{},fiState:{},mail:null};
+const TZ="Europe/Madrid";
+
+
+// ---------- Utilidades ----------
+const $=s=>document.querySelector(s);
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const TODAY=iso(new Date());
+const parse=s=>{const[a,b,c]=String(s).split("-").map(Number);return new Date(a,(b||1)-1,c||1)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return iso(d)};
+const diffDays=(a,b)=>Math.round((parse(a)-parse(b))/864e5);
+const MES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const MESL=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DIA=["dom","lun","mar","mié","jue","vie","sáb"];
+const fDate=s=>{if(!s)return"";const d=parse(s);return DIA[d.getDay()]+" "+d.getDate()+" "+MES[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"")};
+const relDay=s=>{const n=diffDays(s,TODAY);if(n===0)return"Hoy";if(n===1)return"Mañana";if(n===-1)return"Ayer";if(n<0)return"Hace "+(-n)+" d";if(n<7)return"En "+n+" d";return fDate(s)};
+const eur=(v,dec)=>{v=Number(v)||0;const a=Math.abs(v);if(!dec&&a>=1e6)return(v/1e6).toLocaleString("es-ES",{maximumFractionDigits:2})+" M€";if(!dec&&a>=1e4)return(v/1e3).toLocaleString("es-ES",{maximumFractionDigits:1})+" k€";return v.toLocaleString("es-ES",{maximumFractionDigits:0})+" €"};
+const pct=v=>(isFinite(v)?(v*100).toLocaleString("es-ES",{maximumFractionDigits:1}):"–")+" %";
+const ini=n=>String(n||"?").replace(/\(.*?\)/g,"").trim().split(/\s+/).filter(w=>w.length>2||/^[A-Z]/.test(w)).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"?";
+const mk=(y,m)=>y+"-"+pad(m);
+const monthAdd=(k,n)=>{let[y,m]=k.split("-").map(Number);m+=n;while(m<1){m+=12;y--}while(m>12){m-=12;y++}return mk(y,m)};
+const CUR=TODAY.slice(0,7);
+const range=(a,b)=>{const r=[];let k=a;let g=0;while(k<=b&&g<60){r.push(k);k=monthAdd(k,1);g++}return r};
+
+const ICON={
+ home:'<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.4 3.5 5.2"/>',
+ cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+ phone:'<path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 6 6L15 14l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>',
+ note:'<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ meet:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.7 3.4-5.6 7-5.6s6.3 1.9 7 5.6"/>',
+ bag:'<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ wa:'<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.6-2-1-1 .8a4 4 0 0 1-2.2-2.2l.8-1-1-2z"/>',
+ build:'<path d="M4 21V5l8-2v18M12 9h8v12M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2"/>'
+};
+const ic=(n,extra)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'+(extra||"")+'>'+ICON[n]+'</svg>';
+
+// ---------- Datos derivados ----------
+const cliente=id=>S.cl.find(c=>c.id===id);
+const pend=()=>S.ac.filter(a=>!a.hecha);
+function lastContact(cid){let m="";for(const r of S.re)if(r.clienteId===cid&&r.fecha<=TODAY&&r.fecha>m)m=r.fecha;for(const a of S.ac)if(a.clienteId===cid&&a.hecha&&a.fecha<=TODAY&&a.fecha>m)m=a.fecha;return m}
+function nextAction(cid){let b=null;for(const a of S.ac)if(a.clienteId===cid&&!a.hecha&&(!b||a.fecha<b.fecha))b=a;return b}
+const kpOf=cid=>S.kp[S.emp+"|"+cid];
+function meses(cid){const k=kpOf(cid);return(k&&Array.isArray(k.meses))?k.meses:[]}
+function agg(cid,ks){const set=new Set(ks);const o={ventas:0,produccion:0,coste:0,coste_estimado:0,servicios:0,cobrado:0,n:0};for(const m of meses(cid))if(set.has(m.m)){o.ventas+=+m.ventas||0;o.produccion+=+m.produccion||0;o.coste+=+m.coste||0;o.coste_estimado+=+m.coste_estimado||0;o.servicios+=+m.servicios||0;o.cobrado+=+m.cobrado||0;o.n++}o.margen=o.produccion-o.coste;o.mpct=o.produccion?o.margen/o.produccion:NaN;o.ticket=o.servicios?o.produccion/o.servicios:NaN;o.estPct=o.coste?o.coste_estimado/o.coste:NaN;return o}
+const cartKey=(d,h)=>S.emp+"|"+d+"|"+h;
+const K3=()=>[monthAdd(CUR,-2),CUR],K3P=()=>[monthAdd(CUR,-5),monthAdd(CUR,-3)],K12=()=>[monthAdd(CUR,-11),CUR];
+const cartRow=(k,cid)=>{const c=S.cart[cartKey(...k)];return c&&c.map?c.map[cid]:null};
+function period(){
+  const y=+CUR.slice(0,4),m=+CUR.slice(5,7);
+  let cur,prev,label,prevLabel;
+  switch(S.per){
+    case"mes":cur=[CUR];prev=[monthAdd(CUR,-12)];label=MESL[m-1]+" "+y;prevLabel="mismo mes "+(y-1);break;
+    case"3m":cur=range(monthAdd(CUR,-2),CUR);prev=range(monthAdd(CUR,-5),monthAdd(CUR,-3));label="últimos 3 meses";prevLabel="3 meses anteriores";break;
+    case"ytd":cur=range(mk(y,1),CUR);prev=range(mk(y-1,1),mk(y-1,m));label="año "+y+" (ene–"+MES[m-1]+")";prevLabel="mismo tramo "+(y-1);break;
+    case"custom":{let a=S.cFrom||monthAdd(CUR,-5),b=S.cTo||CUR;if(a>b)[a,b]=[b,a];cur=range(a,b);const n=cur.length;prev=range(monthAdd(a,-n),monthAdd(a,-1));label=MES[+a.slice(5)-1]+" "+a.slice(0,4)+" – "+MES[+b.slice(5)-1]+" "+b.slice(0,4);prevLabel="periodo anterior";break}
+    default:cur=range(monthAdd(CUR,-11),CUR);prev=range(monthAdd(CUR,-23),monthAdd(CUR,-12));label="últimos 12 meses";prevLabel="12 meses anteriores";
+  }
+  return{cur,prev,label,prevLabel};
+}
+function health(cid){
+  const lc=lastContact(cid);const days=lc?diffDays(TODAY,lc):999;
+  let va,vb;if(kpOf(cid)){va=agg(cid,range(...K3())).ventas;vb=agg(cid,range(...K3P())).ventas}else{va=(cartRow(K3(),cid)||{}).ventas||0;vb=(cartRow(K3P(),cid)||{}).ventas||0}
+  const tr=vb?(va-vb)/vb:0;
+  const k=kpOf(cid)||cartRow(K3(),cid)||{};const venc=+k.vencido||0;
+  const reasons=[];let lvl=0;
+  if(!lc){lvl=1;reasons.push("Sin contactos registrados en el CRM")}else if(days>45){lvl=2;reasons.push("Sin contacto desde hace "+days+" días")}else if(days>25){lvl=Math.max(lvl,1);reasons.push(days+" días sin contacto")}
+  if(tr<-.2){lvl=2;reasons.push("Facturación de los últimos 3 meses "+pct(tr)+" frente a los 3 anteriores")}else if(tr<-.05){lvl=Math.max(lvl,1);reasons.push("Facturación a la baja ("+pct(tr)+" en 3 meses)")}
+  if(venc>0){lvl=Math.max(lvl,1);reasons.push(eur(venc)+" vencido sin cobrar")}
+  if(nextAction(cid)==null){lvl=Math.max(lvl,1);reasons.push("Ninguna próxima acción planificada")}
+  return{lvl,days,tr,reasons,lc,va};
+}
+const HL=[["good","Cliente activo"],["warn","Vigilar"],["bad","En riesgo"]];
+
+// ---------- Microsoft: inicio de sesión y Outlook (Microsoft Graph) ----------
+const SCOPES=["User.Read","Calendars.ReadWrite","Mail.ReadWrite"];
+const DEVKEY=(()=>{try{return localStorage.getItem("crm.devKey")||""}catch(e){return""}})();
+let MSAL=null,ACCOUNT=null;
+async function initAuth(){
+  if(DEVKEY){S.graph=false;return true}
+  if(!CONF.clientId||!CONF.api){S.auth={state:"setup",msg:""};return false}
+  if(!window.msal){S.auth={state:"error",msg:"No se ha podido cargar el inicio de sesión de Microsoft. Comprueba la conexión y vuelve a abrir la app."};return false}
+  try{
+    MSAL=new msal.PublicClientApplication({auth:{clientId:CONF.clientId,authority:"https://login.microsoftonline.com/"+(CONF.tenantId||"organizations"),redirectUri:CONF.redirectUri||(location.origin+location.pathname),postLogoutRedirectUri:CONF.redirectUri||(location.origin+location.pathname),navigateToLoginRequestUrl:false},cache:{cacheLocation:"localStorage"}});
+    await MSAL.initialize();
+  }catch(e){S.auth={state:"error",msg:"No se ha podido preparar el inicio de sesión de Microsoft."};return false}
+  let msg="";
+  try{const r=await MSAL.handleRedirectPromise();if(r&&r.account)MSAL.setActiveAccount(r.account)}
+  catch(e){msg=/access_denied|user_cancel/i.test((e&&e.errorCode)||"")?"Has cancelado la entrada.":"No se ha podido completar la entrada con Microsoft"+(e&&e.errorCode?" ("+e.errorCode+")":"")+"."}
+  ACCOUNT=MSAL.getActiveAccount()||MSAL.getAllAccounts()[0]||null;
+  if(ACCOUNT){MSAL.setActiveAccount(ACCOUNT);S.graph=true;return true}
+  S.auth={state:"login",msg};return false}
+function login(){if(MSAL)MSAL.loginRedirect({scopes:SCOPES,prompt:"select_account"}).catch(()=>{})}
+function logout(){try{for(const k of Object.keys(localStorage))if(/^crm\.(snap|yo)/.test(k))localStorage.removeItem(k)}catch(e){}
+  if(MSAL&&ACCOUNT)MSAL.logoutRedirect({account:ACCOUNT}).catch(()=>location.reload());else location.reload()}
+async function token(force){
+  try{const r=await MSAL.acquireTokenSilent({scopes:SCOPES,account:ACCOUNT,forceRefresh:!!force});return r.accessToken}
+  catch(e){const c=String((e&&e.errorCode)||"");
+    if((window.msal&&e instanceof msal.InteractionRequiredAuthError)||/interaction_required|login_required|consent_required|no_tokens_found|no_account/i.test(c)){
+      await MSAL.acquireTokenRedirect({scopes:SCOPES,account:ACCOUNT});return new Promise(()=>{})}
+    throw{msg:"No se ha podido renovar tu sesión de Microsoft. Comprueba la conexión."}}}
+function olMsg(st,j){if(st===401)return"Tu sesión de Microsoft ha caducado. Cierra la app y vuelve a abrirla.";if(st===403)return"Tu cuenta no tiene permiso para esta función de Outlook.";if(st===429||st===503)return"Outlook está saturado. Inténtalo en un momento.";
+  return"Outlook ha respondido con un error"+(j&&j.error&&j.error.message?": "+String(j.error.message).slice(0,160):".")}
+async function graph(path,opt){opt=opt||{};if(!S.graph)throw{msg:"Outlook no está disponible en el modo de pruebas."};
+  const go1=async force=>{const h={Authorization:"Bearer "+await token(force)};if(opt.body)h["Content-Type"]="application/json";Object.assign(h,opt.headers||{});
+    return fetch("https://graph.microsoft.com/v1.0"+path,{method:opt.method||"GET",headers:h,body:opt.body?JSON.stringify(opt.body):undefined})};
+  let r;try{r=await go1(false);if(r.status===401)r=await go1(true)}catch(e){if(e&&e.msg)throw e;throw{msg:"Sin conexión con Outlook."}}
+  if(r.status===204||r.status===202)return{};const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw{msg:olMsg(r.status,j),status:r.status};return j}
+const domainOf=m=>{m=String(m||"").toLowerCase();const i=m.indexOf("@");return i>0?m.slice(i+1):""};
+const PUBLIC_DOM=/^(gmail|hotmail|outlook|yahoo|live|icloud|msn)\./;
+function addToOutlook(o){
+  if(!S.graph)return Promise.resolve({ok:false,msg:"Outlook no está disponible."});
+  const[h,mi]=(o.hora||"09:00").split(":").map(Number);const st=o.fecha+"T"+pad(h)+":"+pad(mi)+":00";const endD=new Date(parse(o.fecha).getTime()+((h*60+mi+(+o.dur||60))*60000));
+  const en=iso(endD)+"T"+pad(endD.getHours())+":"+pad(endD.getMinutes())+":00";
+  const ev={subject:o.subject.slice(0,250),start:{dateTime:st,timeZone:TZ},end:{dateTime:en,timeZone:TZ},body:{contentType:"text",content:o.body||""},showAs:"busy"};
+  if(o.location)ev.location={displayName:o.location.slice(0,500)};
+  if(o.invite&&o.email)ev.attendees=[{emailAddress:{address:o.email,name:o.name||o.email},type:"required"}];
+  return graph("/me/events",{method:"POST",body:ev}).then(r=>({ok:true,link:r.webLink||""})).catch(e=>({ok:false,msg:e.msg||"No se ha podido crear la cita."}));
+}
+
+// ---------- Empresa y equipo ----------
+const empOf=c=>c.empresa||CFG.empresas[0];
+function applyFilter(){
+  const who=S.quien==="todos"?null:S.quien==="yo"?S.me:S.quien;
+  let cl=S.RAW.cl.filter(c=>empOf(c)===S.emp);const ids=new Set(cl.map(c=>c.id));
+  let ac=S.RAW.ac.filter(a=>ids.has(a.clienteId)),re=S.RAW.re.filter(r=>ids.has(r.clienteId)),op=S.RAW.op.filter(o=>ids.has(o.clienteId));
+  if(who){ac=ac.filter(a=>a.autor===who);re=re.filter(r=>r.autor===who);op=op.filter(o=>o.autor===who);
+    const act=new Set([...ac,...re,...op].map(x=>x.clienteId));cl=cl.filter(c=>c.responsable===who||act.has(c.id))}
+  S.cl=cl;S.ac=ac;S.re=re;S.op=op}
+const pname=id=>!id?"":id===S.me?"Tú":(S.names[id]||id);
+function teamIds(){const ids=new Set(S.comerciales);for(const k of["cl","re","ac","op"])for(const x of S.RAW[k]){if(x.autor)ids.add(x.autor)}if(S.me)ids.delete(S.me);return[...ids]}
+const LOGO={STINSA:"img/stinsa.png",TRANSARGI:"img/transargi.png"};
+const logoImg=(src,alt,cls)=>'<img'+(cls?' class="'+cls+'"':'')+' src="'+src+'" alt="'+alt+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'alt\',textContent:\''+alt.toUpperCase()+'\'}))">';
+function renderBrand(){
+  document.documentElement.setAttribute("data-emp",S.emp);
+  const html='<div class="brand-in">'+logoImg("img/trimodos.png","Grupo Trimodos","gt")+'<div class="units"><span class="logo">'+logoImg(LOGO[S.emp],S.emp)+'</span></div></div>';
+  const b=$("#brand");if(b&&b.dataset.k!==S.emp){b.innerHTML=html;b.dataset.k=S.emp}}
+function ctxBar(){
+  const otra=CFG.empresas.find(e=>e!==S.emp);
+  const emp=otra?'<button class="empchip" data-emp="'+otra+'" aria-label="Cambiar a '+otra+'"><i></i>'+esc(S.emp)+' ⇄</button>':'<span class="empchip"><i></i>'+esc(S.emp)+'</span>';
+  const opts='<option value="todos">Todo el equipo</option>'+(S.me?'<option value="yo">Solo lo mío</option>':"")+teamIds().map(i=>'<option value="'+esc(i)+'">'+esc(pname(i))+'</option>').join("");
+  return '<div class="ctx">'+emp+'<button class="iconbtn sm" data-act="reOdoo" aria-label="Actualizar desde Odoo" title="Actualizar desde Odoo">'+(S.od.state==="refresh"||S.od.state==="loading"?"…":"↻")+'</button><div class="who"><label for="quien" class="sr">Ver el CRM de</label>'+ic("users")+'<select id="quien">'+opts.replace('value="'+S.quien+'"','value="'+S.quien+'" selected')+'</select></div></div>'}
+const digits=n=>String(n||"").replace(/[^\d+]/g,"");
+function intl(n){let d=digits(n);if(!d)return"";if(d.startsWith("+"))return d.slice(1);if(d.startsWith("00"))return d.slice(2);if(d.length===9)return"34"+d;return d}
+const telHref=n=>{const i=intl(n);return i?"tel:+"+i:""};
+const waHref=(n,txt)=>{const i=intl(n);return i?"https://wa.me/"+i+(txt?"?text="+encodeURIComponent(txt):""):""};
+
+// ---------- Render ----------
+function setTop(title,back,right){
+  const prof=S.me?'<button class="iconbtn" data-act="perfil" aria-label="Mi perfil y equipo">'+ic("meet")+'</button>':"";
+  $("#top").innerHTML=(back?'<button class="iconbtn" data-act="back" aria-label="Volver">'+ic("back")+'</button>':"")+'<h1>'+esc(title)+'</h1>'+(right||"")+(back?"":prof)+(back||!S.RAW.cl.length?"":ctxBar());
+}
+function renderNav(){
+  const v=S.view==="cliente"?"clientes":S.view;
+  const over=pend().filter(a=>a.fecha<TODAY).length;
+  const b=(id,label,icon,extra)=>'<button data-go="'+id+'"'+(v===id?' aria-current="page"':"")+'>'+ic(icon)+label+(extra||"")+'</button>';
+  $("#nav").innerHTML=b("hoy","Hoy","home")+b("clientes","Clientes","users")+'<button data-act="add" aria-label="Añadir"><span class="plus">'+ic("plus")+'</span></button>'+b("agenda","Agenda","cal",over?'<span class="badge">'+over+'</span>':"")+b("cartera","Cartera","chart");
+}
+let renderPend=false;
+// Mientras se escribe en un campo o hay un desplegable abierto, la pantalla no se redibuja
+// (si no, el campo se sustituye y se cierra el teclado o el desplegable). Se redibuja al salir del campo.
+const CAMPOS=/^(INPUT|TEXTAREA|SELECT)$/;
+function campoEnPantalla(a){return !!(a&&CAMPOS.test(a.tagName)&&a.type!=="checkbox"&&a.type!=="radio"&&(a.closest("#app")||a.closest("#top")))}
+function campoActivo(){return campoEnPantalla(document.activeElement)}
+function render(){
+  if(campoActivo()){renderPend=true;return}
+  renderPend=false;
+  renderBrand();renderNav();
+  const app=$("#app");
+  const A=S.auth.state;
+  if(A==="setup"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>Falta configurar la app</h2><p>Hay que poner los datos del registro de Azure en el archivo config.js. Las instrucciones están en el README del repositorio.</p></div>';return}
+  if(A==="login"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>CRM comercial de STINSA y TRANSARGI</h2><p>Entra con tu cuenta de Microsoft de la empresa. La app usa tu usuario de Odoo y tu Outlook: lo que guardes queda a tu nombre.</p>'+(S.auth.msg?'<div class="banner">'+esc(S.auth.msg)+'</div>':"")+'<button class="btn ms" data-act="login"><i><b style="background:#f25022"></b><b style="background:#7fba00"></b><b style="background:#00a4ef"></b><b style="background:#ffb900"></b></i>Entrar con Microsoft</button></div>';return}
+  if(A==="nouser"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>No encontramos tu usuario de Odoo</h2><p>Has entrado como <b>'+esc(ACCOUNT?ACCOUNT.username:"")+'</b>, pero ese correo no coincide con ningún usuario de Odoo. Pide a quien administra el CRM que lo vincule (en n8n, «usuariosAlias»).</p><div class="btnrow"><button class="btn" data-act="retryYo">Reintentar</button><button class="btn ghost" data-act="logout">Entrar con otra cuenta</button></div></div>';return}
+  if(A==="noemp"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>Sin empresas del CRM</h2><p>Tu usuario de Odoo no tiene acceso a STINSA ni a TRANSARGI.</p><button class="btn ghost" data-act="logout">Salir</button></div>';return}
+  if(A==="error"&&!S.me){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>No se puede entrar ahora</h2><p>'+esc(S.auth.msg)+'</p><div class="btnrow"><button class="btn" data-act="retryYo">Reintentar</button>'+(ACCOUNT?'<button class="btn ghost" data-act="logout">Salir</button>':'')+'</div></div>';return}
+  if(!S.me){setTop(CFG.appName);app.innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';return}
+  if(!S.RAW.cl.length&&(S.od.state==="loading"||S.od.state==="idle")){setTop(CFG.appName);app.innerHTML='<p style="margin:4px 0 0;color:var(--muted);font-size:14px">Cargando tus clientes de Odoo…</p><div class="skel"></div><div class="skel"></div><div class="skel"></div>';return}
+  if(!S.RAW.cl.length&&S.od.state==="error"){setTop(CFG.appName);app.innerHTML='<div class="state"><h2>No se puede leer Odoo</h2><p>'+esc(S.od.msg)+'</p><button class="btn" data-act="reOdoo">Reintentar</button></div>';return}
+  const slow=S.od.state==="error"?'<div class="banner"><b>No se ha podido actualizar desde Odoo.</b> '+esc(S.od.msg)+'</div>':"";
+  const fn={hoy:vHoy,clientes:vClientes,agenda:vAgenda,cartera:vCartera,cliente:vCliente}[S.view]||vHoy;
+  app.innerHTML=slow+fn();
+}
+
+function actionRow(a,showClient){
+  const c=cliente(a.clienteId);const n=diffDays(a.fecha,TODAY);
+  const cls=a.hecha?"":(n<0?"bad":n===0?"warn":"");
+  const prio=a.prioridad==="alta"&&!a.hecha?'<span class="pill bad">Alta</span>':"";
+  return '<div class="row"><button class="check'+(a.hecha?" on":"")+'" data-act="toggle" data-id="'+esc(a.id)+'" aria-label="'+(a.hecha?"Marcar pendiente":"Marcar hecha")+'">'+(a.hecha?ic("check"):"")+'</button>'+
+   '<button class="main" style="background:none;border:0;padding:0;text-align:left" data-act="actMenu" data-id="'+esc(a.id)+'"><span class="t"'+(a.hecha?' style="text-decoration:line-through;color:var(--muted)"':"")+'>'+esc(a.titulo)+'</span><span class="s">'+esc(a.tipo||"Tarea")+(showClient&&c?" · "+esc(c.nombre):"")+(S.quien==="todos"&&a.autor&&a.autor!==S.me?" · "+esc(pname(a.autor)):"")+'</span></button>'+
+   '<div class="end"><span class="pill '+cls+'">'+relDay(a.fecha)+'</span>'+prio+'</div></div>';
+}
+function clientRow(c,end){
+  return '<button class="row" data-cli="'+esc(c.id)+'"><span class="avatar">'+esc(ini(c.nombre))+'</span><span class="main"><span class="t">'+esc(c.nombre)+'</span><span class="s">'+esc([c.sector,c.ciudad].filter(Boolean).join(" · "))+'</span></span><span class="end">'+(end||"")+'</span></button>';
+}
+
+function vHoy(){
+  setTop("Hoy, "+fDate(TODAY));
+  const p=pend();const over=p.filter(a=>a.fecha<TODAY),today=p.filter(a=>a.fecha===TODAY),week=p.filter(a=>a.fecha>TODAY&&a.fecha<=addDays(TODAY,7));
+  const focus=[...over,...today].sort((a,b)=>(a.fecha<b.fecha?-1:1));
+  const next=week.sort((a,b)=>(a.fecha<b.fecha?-1:1));
+  return '<section class="tally"><button class="bad" data-go="agenda"><span class="n num">'+over.length+'</span><span class="l">Vencidas</span></button><button class="warn" data-go="agenda"><span class="n num">'+today.length+'</span><span class="l">Para hoy</span></button><button data-go="agenda"><span class="n num">'+week.length+'</span><span class="l">Próx. 7 días</span></button></section>'+
+  '<section class="sec"><div class="sec-h"><span class="eyebrow">Tu foco de hoy</span><button class="link" data-act="newAccion">+ Acción</button></div><div class="list">'+(focus.length?focus.map(a=>actionRow(a,true)).join(""):'<div class="empty">Nada vencido ni para hoy. Buen momento para llamar a un cliente que lleve tiempo sin noticias.</div>')+'</div></section>'+
+  '<section class="sec"><div class="sec-h"><span class="eyebrow">Próximos 7 días</span><button class="link" data-go="agenda">Ver agenda</button></div><div class="list">'+(next.length?next.slice(0,12).map(a=>actionRow(a,true)).join(""):'<div class="empty">No hay acciones para los próximos días.</div>')+'</div>'+(next.length>12?'<p style="margin:0;font-size:13px;color:var(--muted)">Y '+(next.length-12)+' más en la agenda.</p>':"")+'</section>';
+}
+function meetRow(r){
+  const c=cliente(r.clienteId);
+  return '<button class="row" data-cli="'+esc(r.clienteId)+'" data-tab="reuniones"><span class="avatar" style="background:var(--sunk);color:var(--ink)">'+ic("meet",' style="width:20px;height:20px"')+'</span><span class="main"><span class="t">'+esc(c?c.nombre:"Cliente")+'</span><span class="s">'+esc(r.tipo||"Reunión")+(r.resumen?" · "+esc(String(r.resumen).slice(0,80))+(String(r.resumen).length>80?"…":""):"")+'</span></span><span class="end"><span class="pill">'+relDay(r.fecha)+'</span></span></button>';
+}
+
+function vClientes(){
+  setTop("Clientes",false,'<button class="iconbtn" data-act="newCliente" aria-label="Nuevo cliente">'+ic("plus")+'</button>');
+  const q=S.q.trim().toLowerCase();
+  let list=S.cl.filter(c=>!q||[c.nombre,c.ciudad,c.sector,c.contacto].join(" ").toLowerCase().includes(q));
+  if(S.sort==="ventas"&&!S.cart[cartKey(...K12())])cargarCartera(...K12());
+  const enrich=list.map(c=>({c,na:nextAction(c.id),h:health(c.id),v:(cartRow(K12(),c.id)||{}).ventas||0}));
+  if(S.sort==="accion")enrich.sort((a,b)=>(a.na?a.na.fecha:"9")<(b.na?b.na.fecha:"9")?-1:1);
+  else if(S.sort==="ventas")enrich.sort((a,b)=>b.v-a.v);
+  else if(S.sort==="riesgo")enrich.sort((a,b)=>b.h.lvl-a.h.lvl||b.h.days-a.h.days);
+  else enrich.sort((a,b)=>a.c.nombre.localeCompare(b.c.nombre,"es"));
+  const chip=(id,l)=>'<button class="chip" data-sort="'+id+'" aria-pressed="'+(S.sort===id)+'">'+l+'</button>';
+  return '<div class="search">'+ic("search")+'<input id="q" type="search" placeholder="Buscar cliente, ciudad o contacto" value="'+esc(S.q)+'" autocomplete="off"></div>'+
+   '<div class="chips">'+chip("accion","Próxima acción")+chip("ventas","Facturación 12 m")+chip("riesgo","En riesgo primero")+chip("az","A–Z")+'</div>'+
+   '<div class="list" id="clist">'+(enrich.length?enrich.map(x=>{
+     const h=HL[x.h.lvl];
+     const end=S.sort==="ventas"?'<span class="num" style="font-weight:600">'+eur(x.v)+'</span>':(x.na?'<span class="pill '+(x.na.fecha<TODAY?"bad":x.na.fecha===TODAY?"warn":"")+'">'+relDay(x.na.fecha)+'</span>':'<span class="pill">Sin acción</span>');
+     return clientRow(x.c,end+'<span class="pill '+h[0]+'"><span class="dot"></span>'+h[1]+'</span>');
+   }).join(""):'<div class="empty">'+(S.q?'Ningún cliente coincide con «'+esc(S.q)+'».':'No hay clientes de '+esc(S.emp)+(S.quien!=="todos"?" para esta persona":"")+'. Pulsa + para añadir uno.')+'</div>')+'</div>';
+}
+
+function vAgenda(){
+  setTop("Agenda",false,'<button class="iconbtn" data-act="newAccion" aria-label="Nueva acción">'+ic("plus")+'</button>');
+  const hechas=S.agTab==="h";
+  const p=S.ac.filter(a=>hechas?a.hecha:!a.hecha);
+  const g=[["Vencidas",a=>a.fecha<TODAY],["Hoy",a=>a.fecha===TODAY],["Mañana",a=>a.fecha===addDays(TODAY,1)],["Esta semana",a=>a.fecha>addDays(TODAY,1)&&a.fecha<=addDays(TODAY,7)],["Más adelante",a=>a.fecha>addDays(TODAY,7)]];
+  let out='<div class="chips"><button class="chip" data-agt="p" aria-pressed="'+(S.agTab==="p")+'">Acciones</button>'+'<button class="chip" data-agt="h" aria-pressed="'+hechas+'">Hechas</button></div>';
+  if(hechas){const l=p.sort((a,b)=>a.fecha<b.fecha?1:-1).slice(0,40);return out+'<div class="list">'+(l.length?l.map(a=>actionRow(a,true)).join(""):'<div class="empty">Aún no has completado acciones.</div>')+'</div>'}
+  let any=false;
+  for(const[t,f]of g){const l=p.filter(f).sort((a,b)=>a.fecha<b.fecha?-1:1);if(!l.length)continue;any=true;out+='<section class="sec"><span class="eyebrow">'+t+' · '+l.length+'</span><div class="list">'+l.map(a=>actionRow(a,true)).join("")+'</div></section>'}
+  return out+(any?"":'<div class="state"><h2>Agenda despejada</h2><p>No tienes acciones pendientes. Añade la siguiente llamada o visita para no perder el hilo.</p><button class="btn" data-act="newAccion">Añadir acción</button></div>');
+}
+
+function vCartera(){
+  setTop("Cartera");
+  const P=period();const A=S.cart[cartKey(P.cur[0],P.cur.at(-1))],B=S.cart[cartKey(P.prev[0],P.prev.at(-1))];
+  if(!A)cargarCartera(P.cur[0],P.cur.at(-1));if(!B)cargarCartera(P.prev[0],P.prev.at(-1));
+  const opOpen=S.op.filter(o=>!/ganad|perdid/i.test(o.etapa||"")).sort((a,b)=>(+b.importe||0)-(+a.importe||0));
+  let body;
+  if(!A||A.state==="loading")body='<p style="margin:0;color:var(--muted);font-size:14px">Calculando con Odoo… con periodos largos tarda unos segundos.</p><div class="skel"></div><div class="skel"></div>';
+  else if(A.state==="error")body='<div class="list"><div class="empty">'+esc(A.msg)+' <button class="btn small" data-act="reCart">Reintentar</button></div></div>';
+  else{
+    const enCl=new Set(S.cl.map(c=>c.id));const filtra=S.quien!=="todos";
+    const rows=(A.data.clientes||[]).filter(x=>!filtra||enCl.has(String(x.partner_id)));
+    const prevMap=(B&&B.map)||{};
+    const sum=(arr,k)=>arr.reduce((t,x)=>t+(+x[k]||0),0);
+    const t={ventas:sum(rows,"ventas"),produccion:sum(rows,"produccion"),coste:sum(rows,"coste"),est:sum(rows,"coste_estimado"),pend:sum(rows,"pendiente"),venc:sum(rows,"vencido")};
+    const tpv=B&&B.state==="ok"?(B.data.clientes||[]).filter(x=>!filtra||enCl.has(String(x.partner_id))).reduce((a,x)=>a+(+x.ventas||0),0):0;
+    const mg=t.produccion-t.coste;const max=Math.max(1,...rows.map(r=>r.ventas));
+    body='<div class="kpis">'+kpiLead("Facturación total",t.ventas,tpv,P)+
+     '<div class="kpi"><span class="l">Margen</span><span class="v num">'+eur(mg)+'</span><span class="d flat">'+pct(t.produccion?mg/t.produccion:NaN)+' s/producción</span><span class="d flat">'+(t.coste?pct(t.est/t.coste)+' del coste estimado':'')+'</span></div>'+
+     '<div class="kpi"><span class="l">Pendiente de cobro</span><span class="v num">'+eur(t.pend)+'</span><span class="d '+(t.venc?"down":"flat")+'">'+(t.venc?eur(t.venc)+" vencido":"Nada vencido")+'</span></div></div>'+
+     '<section class="sec"><span class="eyebrow">Facturación por cliente · '+esc(P.label)+'</span><div class="list">'+(rows.length?rows.slice(0,100).map(r=>{const id=String(r.partner_id);const pv=(prevMap[id]||{}).ventas||0;const d=pv?(r.ventas-pv)/pv:NaN;const tag=enCl.has(id)?'button class="row" data-cli="'+esc(id)+'"':'div class="row"';
+       return '<'+tag+'><span class="main"><span class="t">'+esc(r.nombre)+'</span><span class="s">Margen '+pct(r.produccion?r.margen/r.produccion:NaN)+(r.vencido?' · '+eur(r.vencido)+' vencido':'')+'</span><span style="display:block;height:6px;border-radius:3px;background:var(--sunk);margin-top:6px;overflow:hidden"><span style="display:block;height:100%;width:'+(Math.max(0,r.ventas)/max*100).toFixed(1)+'%;background:var(--accent);border-radius:3px"></span></span></span><span class="end"><span class="num" style="font-weight:600">'+eur(r.ventas)+'</span>'+delta(d)+'</span></'+tag.split(" ")[0]+'>'}).join(""):'<div class="empty">Sin facturación en este periodo.</div>')+'</div>'+(rows.length>100?'<p style="font-size:13px;color:var(--muted);margin:0">Se muestran los 100 clientes con más facturación de '+rows.length+'.</p>':'')+'</section>';
+  }
+  return periodPicker()+body+(opOpen.length?'<section class="sec"><span class="eyebrow">Oportunidades abiertas</span><div class="list">'+opOpen.map(o=>oppRow(o,true)).join("")+'</div></section>':"");
+}
+
+const STAGES=["Nueva","Contactado","Propuesta enviada","Negociación","Ganada"];
+function oppRow(o,showClient){
+  const c=cliente(o.clienteId);const i=Math.max(0,STAGES.findIndex(s=>s.toLowerCase()===String(o.etapa||"").toLowerCase()));
+  const lost=/perdid/i.test(o.etapa||"");
+  return '<button class="row" data-act="oppMenu" data-id="'+esc(o.id)+'"><span class="main"><span class="t">'+esc(o.nombre)+'</span><span class="s">'+(showClient&&c?esc(c.nombre)+" · ":"")+esc(o.etapa||"Nueva")+(o.cierre?" · cierre "+fDate(o.cierre):"")+'</span>'+(lost?"":'<span class="stage">'+STAGES.map((s,k)=>'<i class="'+(k<=i?"on":"")+'"></i>').join("")+'</span>')+'</span><span class="end"><span class="num" style="font-weight:600">'+eur(o.importe)+'</span><span class="pill '+(lost?"bad":/ganad/i.test(o.etapa||"")?"good":"acc")+'">'+(lost?"Perdida":(+o.probabilidad||0)+" %")+'</span></span></button>';
+}
+
+function delta(d){if(!isFinite(d))return'<span class="d flat">sin comparación</span>';const c=d>.005?"up":d<-.005?"down":"flat";return '<span class="d '+c+' num">'+(d>0?"▲ +":d<0?"▼ ":"")+pct(d)+'</span>'}
+function kpiLead(label,v,prev,P){const d=prev?(v-prev)/prev:NaN;return '<div class="kpi lead"><div><span class="l">'+esc(label)+'</span><div class="v num">'+eur(v)+'</div></div><div style="text-align:right">'+delta(d)+'<div class="vs">vs '+esc(P.prevLabel)+'</div></div></div>'}
+function periodPicker(){
+  const op=(id,l)=>'<option value="'+id+'"'+(S.per===id?" selected":"")+'>'+l+'</option>';
+  return '<div class="sec"><div class="persel"><label for="perSel" class="eyebrow">Periodo</label><select id="perSel">'+op("mes","Este mes")+op("3m","Últimos 3 meses")+op("ytd","Año en curso")+op("12m","Últimos 12 meses")+op("custom","Elegir meses…")+'</select></div>'+
+   (S.per==="custom"?(()=>{const ops=sel=>range(monthAdd(CUR,-23),CUR).reverse().map(k=>'<option value="'+k+'"'+(k===sel?" selected":"")+'>'+MES[+k.slice(5)-1]+" "+k.slice(0,4)+'</option>').join("");
+     return '<div class="custom"><div class="cf"><label for="cFrom" class="eyebrow">Desde</label><select id="cFrom">'+ops(S.cFrom||monthAdd(CUR,-5))+'</select></div><div class="cf"><label for="cTo" class="eyebrow">Hasta</label><select id="cTo">'+ops(S.cTo||CUR)+'</select></div></div>'})():"")+'</div>';
+}
+
+function chart(cid,P){
+  let ks=P.cur.length>=6?P.cur.slice(-24):range(monthAdd(P.cur[P.cur.length-1],-5),P.cur[P.cur.length-1]);
+  const sel=new Set(P.cur);const by={};for(const m of meses(cid))by[m.m]=m;
+  const vals=ks.map(k=>({k,v:+((by[k]||{}).ventas)||0,mg:by[k]?(+by[k].produccion||0)-(+by[k].coste||0):0}));
+  const W=340,H=150,top=18,bot=22,left=4,right=4;const max=Math.max(1,...vals.map(x=>x.v));
+  const nice=(()=>{const p=Math.pow(10,Math.floor(Math.log10(max)));const s=[1,2,2.5,5,10].map(x=>x*p).find(x=>x>=max)||max;return s})();
+  const bw=(W-left-right)/vals.length;const y=v=>top+(H-top-bot)*(1-v/nice);
+  let g='<line x1="'+left+'" x2="'+(W-right)+'" y1="'+y(nice/2)+'" y2="'+y(nice/2)+'" stroke="var(--line)" stroke-dasharray="3 3"/><text x="'+left+'" y="'+(y(nice/2)-4)+'" font-size="10" fill="var(--muted)">'+eur(nice/2)+'</text>';
+  g+='<line x1="'+left+'" x2="'+(W-right)+'" y1="'+y(0)+'" y2="'+y(0)+'" stroke="var(--line)"/>';
+  vals.forEach((x,i)=>{const bx=left+i*bw+bw*.16,w=bw*.68;const on=sel.has(x.k);
+    g+='<rect x="'+bx.toFixed(1)+'" y="'+y(x.v).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(0,y(0)-y(x.v)).toFixed(1)+'" rx="2" fill="'+(on?"var(--accent)":"var(--line)")+'"><title>'+MESL[+x.k.slice(5)-1]+" "+x.k.slice(0,4)+": "+eur(x.v,1)+'</title></rect>';
+    const mh=x.v?Math.max(0,y(0)-y(Math.max(0,x.mg))):0;
+    if(on&&mh>0)g+='<rect x="'+bx.toFixed(1)+'" y="'+(y(0)-mh).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+mh.toFixed(1)+'" rx="2" fill="var(--ink)" fill-opacity=".28"/>';
+    const lbl=vals.length<=12||i%2===(vals.length-1)%2;
+    if(lbl)g+='<text x="'+(bx+w/2).toFixed(1)+'" y="'+(H-6)+'" font-size="10" text-anchor="middle" fill="'+(x.k===CUR?"var(--ink)":"var(--muted)")+'"'+(x.k===CUR?' font-weight="700"':"")+'>'+MES[+x.k.slice(5)-1].slice(0,vals.length>12?1:3)+'</text>';
+  });
+  const last=vals[vals.length-1];
+  if(last&&last.v)g+='<text x="'+(W-right)+'" y="'+Math.max(11,y(last.v)-5).toFixed(1)+'" font-size="10.5" font-weight="700" text-anchor="end" fill="var(--ink)">'+eur(last.v)+'</text>';
+  return '<div class="chartbox"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Facturación mensual">'+g+'</svg><div class="legend"><span><i style="background:var(--accent)"></i>Facturación del periodo</span><span><i style="background:var(--ink);opacity:.28"></i>Margen</span><span><i style="background:var(--line)"></i>Fuera del periodo</span></div></div>';
+}
+
+function vCliente(){
+  const c=cliente(S.cid);
+  if(!c){setTop("Cliente",true);return '<div class="state"><h2>Este cliente ya no existe</h2><p>Puede que se haya borrado. Vuelve a la lista para elegir otro.</p><button class="btn" data-go="clientes">Ver clientes</button></div>'}
+  setTop(c.nombre,true,'<button class="iconbtn" data-act="editCliente" aria-label="Editar cliente">'+ic("note")+'</button>');
+  const kst=S.kpState[S.emp+"|"+c.id];
+  if(S.tab==="datos"&&!S.fiState[S.emp+"|"+c.id])cargarFicha(c.id);
+  const P=period();const a=agg(c.id,P.cur),b=agg(c.id,P.prev);const k=kpOf(c.id)||{};
+  const h=health(c.id);const hl=HL[h.lvl];
+  const acs=S.ac.filter(x=>x.clienteId===c.id);const res=S.re.filter(x=>x.clienteId===c.id).sort((x,y)=>x.fecha<y.fecha?1:-1);const ops=S.op.filter(x=>x.clienteId===c.id);
+  const dlt=(x,y)=>y?(x-y)/y:NaN;
+  const tab=(id,l,n)=>'<button class="tab" role="tab" data-tab2="'+id+'" aria-selected="'+(S.tab===id)+'">'+l+(n!=null?'<span class="c num">'+n+'</span>':"")+'</button>';
+  let body="";
+  if(S.tab==="acciones"){const p=acs.filter(x=>!x.hecha).sort((x,y)=>x.fecha<y.fecha?-1:1),d=acs.filter(x=>x.hecha).sort((x,y)=>x.fecha<y.fecha?1:-1).slice(0,5);
+    body='<div class="list">'+(p.length?p.map(x=>actionRow(x)).join(""):'<div class="empty">Sin acciones pendientes con este cliente.</div>')+'</div>'+(d.length?'<span class="eyebrow">Hechas recientemente</span><div class="list">'+d.map(x=>actionRow(x)).join("")+'</div>':"")+'<div class="btnrow"><button class="btn" data-act="newAccion">Añadir acción</button></div>'}
+  else if(S.tab==="reuniones"){body=(res.length?'<div class="timeline">'+res.map(r=>{const d=parse(r.fecha);return '<div class="tl"><div class="date"><b class="num">'+d.getDate()+'</b><span>'+MES[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+String(d.getFullYear()).slice(2):"")+'</span></div><div class="body"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="pill acc">'+esc(r.tipo||"Reunión")+'</span>'+(r.fecha>TODAY?'<span class="pill warn">Programada</span>':"")+(r.asistentes?'<span class="s" style="font-size:13px;color:var(--muted)">'+esc(r.asistentes)+'</span>':"")+'</div><p>'+esc(r.resumen||"Sin notas")+'</p>'+(r.resultado?'<span class="res">Resultado: '+esc(r.resultado)+'</span>':"")+(r.olLink?'<a href="'+esc(r.olLink)+'" target="_blank" rel="noopener" style="font-size:13px;color:var(--accent);font-weight:600">Ver en Outlook ↗</a>':"")+'</div></div>'}).join("")+'</div>':'<div class="empty" style="padding-inline:0">Aún no hay reuniones con este cliente.</div>')+'<div class="btnrow"><button class="btn" data-act="newReunion">Registrar reunión</button></div>'}
+  else if(S.tab==="oport"){body='<div class="list">'+(ops.length?ops.map(o=>oppRow(o)).join(""):'<div class="empty">Sin oportunidades abiertas.</div>')+'</div><div class="btnrow"><button class="btn" data-act="newOport">Añadir oportunidad</button></div>'}
+  else{body='<dl class="facts"><dt>Contacto</dt><dd>'+esc(c.contacto||"–")+(c.cargo?" · "+esc(c.cargo):"")+'</dd><dt>Teléfono</dt><dd class="num">'+(c.telefono?'<a href="'+telHref(c.telefono)+'" style="color:var(--accent)">'+esc(c.telefono)+'</a>':"–")+'</dd><dt>Móvil</dt><dd class="num">'+(c.movil?'<a href="'+telHref(c.movil)+'" style="color:var(--accent)">'+esc(c.movil)+'</a>':"–")+'</dd><dt>Empresa</dt><dd>'+esc(empOf(c))+'</dd><dt>Responsable</dt><dd>'+esc(c.responsable?pname(c.responsable):"Sin asignar")+'</dd><dt>Email</dt><dd>'+esc(c.email||"–")+'</dd><dt>Dirección</dt><dd>'+esc(c.direccion||c.ciudad||"–")+'</dd><dt>Sector</dt><dd>'+esc(c.sector||"–")+'</dd><dt>Forma de pago</dt><dd>'+esc(k.formaPago||(kst==="ok"?"–":"En «Ver indicadores»"))+'</dd><dt>Ref. Odoo</dt><dd class="num">'+esc(c.odooRef||"Sin vincular")+'</dd></dl>'+(c.notas?'<span class="eyebrow">Notas</span><div class="note">'+esc(c.notas)+'</div>':"")+((c.contactos||[]).length>1?'<span class="eyebrow">Contactos</span><div class="list">'+c.contactos.map(x=>'<div class="row"><span class="main"><span class="t">'+esc(x.nombre)+'</span><span class="s">'+esc([x.cargo,x.email].filter(Boolean).join(" · "))+'</span></span><span class="end">'+(telHref(x.movil||x.telefono)?'<a class="pill acc" href="'+telHref(x.movil||x.telefono)+'">Llamar</a>':'')+'</span></div>').join("")+'</div>':"")}
+  return '<section class="hero"><div class="hero-id"><span class="avatar">'+esc(ini(c.nombre))+'</span><div style="min-width:0"><h2>'+esc(c.nombre)+'</h2><div class="meta">'+esc([c.sector,c.ciudad].filter(Boolean).join(" · "))+'</div></div></div>'+
+   '<div class="quick">'+(telHref(c.movil||c.telefono)?'<a href="'+telHref(c.movil||c.telefono)+'">'+ic("phone")+'Llamar</a>':'<button data-act="noPhone">'+ic("phone")+'Llamar</button>')+(waHref(c.movil||c.telefono)?'<a href="'+waHref(c.movil||c.telefono,"Hola "+(c.contacto||"").split(" ")[0]+", ")+'" target="_blank" rel="noopener">'+ic("wa")+'WhatsApp</a>':'<button data-act="noPhone">'+ic("wa")+'WhatsApp</button>')+'<button data-act="mail">'+ic("mail")+'Correo</button><button data-act="newReunion">'+ic("meet")+'Reunión</button><button data-act="newAccion">'+ic("flag")+'Acción</button></div>'+
+   '<div class="health '+hl[0]+'"><div><b>'+hl[1]+'</b>'+(h.reasons.length?'<ul>'+h.reasons.map(r=>'<li>'+esc(r)+'</li>').join("")+'</ul>':'Contacto reciente, facturación estable y próxima acción planificada.')+'</div></div>'+
+   '</section>'+
+   (kst!=="ok"?'<section class="sec"><span class="eyebrow">Indicadores</span>'+(!kst?'<div class="ondemand"><p>Facturación, margen, servicios, cobros y gráfico de los últimos 24 meses. Se calculan en Odoo solo cuando los pides.</p><button class="btn" data-act="verKpis">'+ic("chart",' style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"')+'Ver indicadores</button></div>':kst==="loading"?'<p style="margin:0;color:var(--muted);font-size:14px">Calculando los indicadores en Odoo…</p><div class="skel"></div><div class="skel"></div>':'<div class="banner"><b>No se han podido leer los indicadores.</b> '+esc(kst.slice(6))+' <button class="btn small" data-act="reKpis">Reintentar</button></div>')+'</section>':
+   '<section class="sec"><span class="eyebrow">Indicadores · '+esc(P.label)+'</span>'+periodPicker()+
+   '<div class="kpis">'+kpiLead("Facturación",a.ventas,b.ventas,P)+
+   '<div class="kpi"><span class="l">Margen</span><span class="v num">'+pct(a.mpct)+'</span>'+delta(dlt(a.margen,b.margen))+(isFinite(a.estPct)&&a.estPct>0?'<span class="d flat">'+pct(a.estPct)+' del coste estimado</span>':'')+'</div>'+
+   '<div class="kpi"><span class="l">Servicios</span><span class="v num">'+a.servicios.toLocaleString("es-ES")+'</span>'+delta(dlt(a.servicios,b.servicios))+'</div>'+
+   '<div class="kpi"><span class="l">Precio medio por servicio</span><span class="v num">'+(isFinite(a.ticket)?eur(a.ticket,1):"–")+'</span>'+delta(dlt(a.ticket,b.ticket))+'</div>'+
+   '<div class="kpi"><span class="l">Pendiente de cobro</span><span class="v num">'+eur(k.pendiente||0)+'</span><span class="d '+((+k.vencido||0)>0?"down":"flat")+'">'+((+k.vencido||0)>0?eur(k.vencido)+" vencido":"Al día")+'</span></div>'+
+   '<div class="kpi"><span class="l">Días medios de cobro</span><span class="v num">'+(k.diasCobro!=null?k.diasCobro+" d":"–")+'</span><span class="d flat">'+(k.formaPago?esc(k.formaPago):"")+'</span></div>'+
+   '<div class="kpi"><span class="l">Último contacto</span><span class="v num">'+(h.lc?(h.days===0?"Hoy":h.days+" d"):"–")+'</span><span class="d flat">'+(h.lc?fDate(h.lc):"Sin contactos en el CRM")+'</span></div>'+
+   '</div>'+chart(c.id,P)+'</section>')+
+   '<section class="sec"><div class="tabs" role="tablist">'+tab("acciones","Acciones",acs.filter(x=>!x.hecha).length)+tab("reuniones","Reuniones",res.length)+tab("oport","Oportunidades",ops.length)+tab("datos","Ficha")+'</div>'+body+'</section>';
+}
+
+// ---------- Hojas y formularios ----------
+function openSheet(html){S.sheet=true;document.body.classList.add("lock");$("#layer").innerHTML='<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true"><div class="sheet-inner"><div class="sh-top"><div class="grab"></div><button class="sh-x" data-act="close" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+html+'</div></div>';const f=$("#layer input:not([type=hidden]):not([type=radio]),#layer select,#layer textarea");if(f&&!f.value)setTimeout(()=>{try{f.focus({preventScroll:true})}catch(e){}},60)}
+function closeSheet(){const ae=document.activeElement;if(ae&&ae.closest&&ae.closest("#layer")){try{ae.blur()}catch(e){}}S.sheet=null;S.mail=null;$("#layer").innerHTML="";document.body.classList.remove("lock");if(renderPend)render()}
+const optsCli=sel=>'<option value="">Elige un cliente…</option>'+[...S.cl].sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")).map(c=>'<option value="'+esc(c.id)+'"'+(c.id===sel?" selected":"")+'>'+esc(c.nombre)+'</option>').join("");
+const seg=(name,vals,sel)=>'<div class="seg">'+vals.map((v,i)=>'<label><input type="radio" name="'+name+'" id="'+name+i+'" value="'+esc(v)+'"'+(v===sel?" checked":"")+'><span>'+esc(v)+'</span></label>').join("")+'</div>';
+const cliFld=sel=>S.view==="cliente"&&S.cid&&!sel?'<input type="hidden" name="clienteId" value="'+esc(S.cid)+'">':'<div class="fld"><label for="fCli">Cliente</label><select id="fCli" name="clienteId" required>'+optsCli(sel||"")+'</select></div>';
+
+function olFieldset(on,hora){if(!S.graph)return"";
+  return '<fieldset><legend>Calendario de Outlook</legend><label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="fOl" name="ol" value="1"'+(on?" checked":"")+'> Añadir a mi calendario</label>'+
+  '<div class="two"><div class="fld"><label for="fOlH">Hora</label><input id="fOlH" type="time" name="olHora" value="'+esc(hora||"09:00")+'" step="900"></div><div class="fld"><label for="fOlD">Duración</label><select id="fOlD" name="olDur"><option value="30">30 min</option><option value="60" selected>1 hora</option><option value="90">1 h 30</option><option value="120">2 horas</option></select></div></div>'+
+  '<label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="fOlInv" name="olInv" value="1"> Enviar invitación al contacto del cliente</label></fieldset>'}
+function sheetAdd(){openSheet('<h3>Añadir</h3><div class="choose">'+
+ '<button data-act="newReunion">'+ic("meet")+'<div><b>Reunión o llamada</b><span>Registra qué se habló y deja la siguiente acción</span></div></button>'+
+ '<button data-act="newAccion">'+ic("flag")+'<div><b>Próxima acción</b><span>Llamada, visita, oferta o seguimiento con fecha</span></div></button>'+
+ '<button data-act="newOport">'+ic("bag")+'<div><b>Oportunidad</b><span>Nueva ruta, servicio o ampliación en juego</span></div></button>'+
+ '<button data-act="newCliente">'+ic("build")+'<div><b>Cliente</b><span>Alta rápida de un cliente o potencial</span></div></button></div>')}
+
+function sheetReunion(pre){pre=pre||{};openSheet('<h3>'+(pre.fromOl?"Registrar cita de Outlook":"Registrar reunión")+'</h3><form class="f" id="fReu">'+(pre.olLink?'<input type="hidden" name="olLink" value="'+esc(pre.olLink)+'">':"")+cliFld(pre.clienteId)+
+ '<div class="two"><div class="fld"><label for="fRFecha">Fecha</label><input id="fRFecha" type="date" name="fecha" value="'+esc(pre.fecha||TODAY)+'" required></div><div class="fld"><label for="fRAsis">Con quién</label><input id="fRAsis" name="asistentes" value="'+esc(pre.asistentes||"")+'" placeholder="Nombre y cargo"></div></div>'+
+ '<div class="fld"><label>Tipo</label>'+seg("tipo",["Visita","Llamada","Videollamada","En nuestra oficina","Email"],pre.tipo||"Visita")+'</div>'+
+ '<div class="fld"><label for="fRRes">Qué se habló</label><textarea id="fRRes" name="resumen" placeholder="Volumen previsto, tarifas, incidencias, rutas nuevas… Si es una reunión futura, escribe el objetivo.">'+esc(pre.resumen||"")+'</textarea></div>'+(pre.fromOl?"":'<p style="margin:-4px 0 0;font-size:12.5px;color:var(--muted)">Si pones una fecha futura queda como reunión programada; marca abajo para llevarla a Outlook.</p>'+olFieldset(false,pre.hora))+
+ '<div class="fld"><label for="fRResu">Resultado</label><input id="fRResu" name="resultado" placeholder="Ej.: pide oferta para ruta a Valencia"></div>'+
+ '<fieldset><legend>Siguiente paso (opcional)</legend><div class="fld"><label for="fRNext">Acción</label><input id="fRNext" name="next" placeholder="Ej.: enviar oferta revisada"></div><div class="fld"><label>Cuándo</label>'+seg("nextWhen",["Mañana","En 3 días","En 1 semana","En 2 semanas","En 1 mes"],"En 1 semana")+'</div></fieldset>'+
+ '<div class="err" id="fErr" hidden></div><div class="btnrow"><button class="btn" type="submit">Guardar reunión</button><button class="btn ghost" type="button" data-act="close">Cancelar</button></div></form>')}
+
+function sheetAccion(a){a=a||{};openSheet('<h3>'+(a.id?"Editar acción":"Nueva acción")+'</h3><form class="f" id="fAcc">'+(a.id?'<input type="hidden" name="id" value="'+esc(a.id)+'"><input type="hidden" name="clienteId" value="'+esc(a.clienteId)+'">':cliFld())+
+ '<div class="fld"><label for="fATit">Qué hay que hacer</label><input id="fATit" name="titulo" required value="'+esc(a.titulo||"")+'" placeholder="Ej.: llamar para cerrar tarifa 2027"></div>'+
+ '<div class="fld"><label>Tipo</label>'+seg("tipo",["Llamada","Visita","Email","Oferta","Cobro","Tarea"],a.tipo||"Llamada")+'</div>'+
+ '<div class="two"><div class="fld"><label for="fAFecha">Fecha</label><input id="fAFecha" type="date" name="fecha" required value="'+esc(a.fecha||addDays(TODAY,1))+'"></div><div class="fld"><label for="fAPrio">Prioridad</label><select id="fAPrio" name="prioridad"><option value="normal">Normal</option><option value="alta"'+(a.prioridad==="alta"?" selected":"")+'>Alta</option></select></div></div>'+
+ '<div class="fld"><label for="fANota">Nota</label><textarea id="fANota" name="nota" style="min-height:60px">'+esc(a.nota||"")+'</textarea></div>'+(a.olLink?'<p style="margin:0;font-size:13px"><a href="'+esc(a.olLink)+'" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Ya está en tu calendario de Outlook ↗</a></p>':olFieldset(false))+
+ '<div class="err" id="fErr" hidden></div><div class="btnrow"><button class="btn" type="submit">Guardar</button><button class="btn ghost" type="button" data-act="close">Cancelar</button>'+'</div></form>')}
+
+function sheetActMenu(a){const c=cliente(a.clienteId);openSheet('<h3>'+esc(a.titulo)+'</h3><p style="margin:-6px 0 12px;color:var(--muted);font-size:14px">'+esc(a.tipo||"Tarea")+(c?" · "+esc(c.nombre):"")+" · "+fDate(a.fecha)+'</p>'+(a.nota?'<div class="note" style="margin-bottom:12px">'+esc(a.nota)+'</div>':"")+
+ '<div class="choose">'+(c&&telHref(c.movil||c.telefono)?'<a href="'+telHref(c.movil||c.telefono)+'">'+ic("phone")+'<div><b>Llamar ahora</b><span>'+esc((c.contacto?c.contacto+" · ":"")+(c.movil||c.telefono))+'</span></div></a>':"")+(c&&waHref(c.movil||c.telefono)?'<a href="'+waHref(c.movil||c.telefono,"Hola "+(c.contacto||"").split(" ")[0]+", ")+'" target="_blank" rel="noopener">'+ic("wa")+'<div><b>Escribir por WhatsApp</b><span>Abre el chat con '+esc(c.contacto||c.nombre)+'</span></div></a>':"")+(c&&S.graph?'<button data-act="mail" data-cid="'+esc(c.id)+'" data-id="'+esc(a.id)+'">'+ic("mail")+'<div><b>'+(a.tipo==="Email"?"Preparar este correo en Outlook":"Escribir al cliente")+'</b><span>Buscar el último correo para seguimiento o pedir una visita</span></div></button>':"")+(a.hecha?'':'<button data-act="done" data-id="'+esc(a.id)+'">'+ic("check")+'<div><b>Marcar como hecha</b><span>Y registrar cómo fue, si quieres</span></div></button>')+(a.olLink?'<a class="olk" href="'+esc(a.olLink)+'" target="_blank" rel="noopener">'+ic("cal")+'<div><b>Ver en Outlook ↗</b><span>Esta acción está en tu calendario</span></div></a>':"")+
+ '<button data-act="snooze" data-d="1" data-id="'+esc(a.id)+'">'+ic("cal")+'<div><b>Posponer a mañana</b><span>'+fDate(addDays(TODAY,1))+'</span></div></button>'+
+ '<button data-act="snooze" data-d="7" data-id="'+esc(a.id)+'">'+ic("cal")+'<div><b>Posponer una semana</b><span>'+fDate(addDays(TODAY,7))+'</span></div></button>'+
+ '<button data-act="editAccion" data-id="'+esc(a.id)+'">'+ic("note")+'<div><b>Editar</b><span>Título, fecha, prioridad o nota</span></div></button>'+
+ (c&&S.view!=="cliente"?'<button data-cli="'+esc(c.id)+'">'+ic("build")+'<div><b>Abrir ficha del cliente</b><span>'+esc(c.nombre)+'</span></div></button>':"")+'</div>')}
+
+function sheetOport(o){o=o||{};openSheet('<h3>'+(o.id?"Editar oportunidad":"Nueva oportunidad")+'</h3><form class="f" id="fOp">'+(o.id?'<input type="hidden" name="id" value="'+esc(o.id)+'"><input type="hidden" name="clienteId" value="'+esc(o.clienteId)+'">':cliFld())+
+ '<div class="fld"><label for="fONom">Oportunidad</label><input id="fONom" name="nombre" required value="'+esc(o.nombre||"")+'" placeholder="Ej.: ruta semanal a Zaragoza"></div>'+
+ '<div class="two"><div class="fld"><label for="fOImp">Importe anual (€)</label><input id="fOImp" name="importe" type="number" inputmode="decimal" min="0" step="100" value="'+esc(o.importe||"")+'"></div><div class="fld"><label for="fOProb">Probabilidad (%)</label><input id="fOProb" name="probabilidad" type="number" inputmode="numeric" min="0" max="100" step="5" value="'+esc(o.probabilidad!=null?o.probabilidad:30)+'"></div></div>'+
+ '<div class="fld"><label>Etapa</label>'+seg("etapa",[...STAGES,"Perdida"],o.etapa||"Nueva")+'</div>'+
+ '<div class="fld"><label for="fOCie">Cierre previsto</label><input id="fOCie" type="date" name="cierre" value="'+esc(o.cierre||addDays(TODAY,30))+'"></div>'+
+ '<div class="err" id="fErr" hidden></div><div class="btnrow"><button class="btn" type="submit">Guardar</button><button class="btn ghost" type="button" data-act="close">Cancelar</button></div></form>')}
+
+function sheetCliente(c){c=c||{};openSheet('<h3>'+(c.id?"Editar cliente":"Nuevo cliente")+'</h3><form class="f" id="fCl">'+(c.id?'<input type="hidden" name="id" value="'+esc(c.id)+'">':"")+
+ '<div class="fld"><label for="fCNom">Nombre</label><input id="fCNom" name="nombre" required value="'+esc(c.nombre||"")+'"></div>'+
+ '<div class="two"><div class="fld"><label for="fCSec">Sector</label><input id="fCSec" name="sector" value="'+esc(c.sector||"")+'" placeholder="Cerámica, química…"></div><div class="fld"><label for="fCCiu">Ciudad</label><input id="fCCiu" name="ciudad" value="'+esc(c.ciudad||"")+'"></div></div>'+
+ '<div class="two"><div class="fld"><label for="fCCon">Contacto</label><input id="fCCon" name="contacto" value="'+esc(c.contacto||"")+'"></div><div class="fld"><label for="fCCar">Cargo</label><input id="fCCar" name="cargo" value="'+esc(c.cargo||"")+'"></div></div>'+
+ '<div class="two"><div class="fld"><label for="fCMov">Móvil (WhatsApp)</label><input id="fCMov" name="movil" type="tel" value="'+esc(c.movil||"")+'" placeholder="6xx xxx xxx"></div><div class="fld"><label for="fCResp">Responsable</label><select id="fCResp" name="responsable">'+[S.me,...teamIds()].filter(Boolean).map(i=>'<option value="'+esc(i)+'"'+((c.responsable||(c.id?"":S.me))===i?" selected":"")+'>'+esc(i===S.me?"Yo":pname(i))+'</option>').join("")+'<option value=""'+(c.id&&!c.responsable?" selected":"")+'>Sin asignar</option></select></div></div>'+
+ '<div class="two"><div class="fld"><label for="fCTel">Teléfono</label><input id="fCTel" name="telefono" type="tel" value="'+esc(c.telefono||"")+'"></div><div class="fld"><label for="fCMail">Email</label><input id="fCMail" name="email" type="email" value="'+esc(c.email||"")+'"></div></div>'+
+ '<div class="fld"><label for="fCDir">Dirección</label><input id="fCDir" name="direccion" value="'+esc(c.direccion||"")+'"></div>'+
+ '<div class="two"><div class="fld"><label for="fCCom">Comercial</label><input id="fCCom" name="comercial" value="'+esc(c.comercial||"")+'"></div><div class="fld"><label for="fCOdoo">Ref. Odoo</label><input id="fCOdoo" name="odooRef" value="'+esc(c.odooRef||"")+'"></div></div>'+
+ '<div class="fld"><label for="fCNot">Notas</label><textarea id="fCNot" name="notas">'+esc(c.notas||"")+'</textarea></div>'+
+ '<div class="err" id="fErr" hidden></div><div class="btnrow"><button class="btn" type="submit">Guardar</button><button class="btn ghost" type="button" data-act="close">Cancelar</button></div></form>')}
+
+// ---------- Correo con Outlook ----------
+function sheetMail(cid,aid){S.mail={cid,aid:aid||null,list:null,state:"loading",msg:"",mode:null,hint:"",subj:"",body:"",gen:"idle",genMsg:"",done:null,remind:true,remindDays:5,closeAct:!!aid};openSheet('<div id="mailBox"></div>');renderMail();loadMails()}
+function mailFrom(m){return m.senderName||m.sender||""}
+function renderMail(){const box=$("#mailBox");if(!box||!S.mail)return;const M=S.mail;const c=cliente(M.cid);if(!c){closeSheet();return}
+  let h='<h3>Correo con '+esc(c.nombre)+'</h3>';
+  if(!c.email){box.innerHTML=h+'<p style="color:var(--muted);margin:0 0 12px">Este cliente no tiene email guardado. Añádelo en su ficha para poder buscar correos y preparar borradores.</p><div class="btnrow"><button class="btn" data-act="editCliente2" data-id="'+esc(c.id)+'">Añadir email</button><button class="btn ghost" data-act="close">Cerrar</button></div>';return}
+  h+='<p style="margin:-6px 0 14px;font-size:14px;color:var(--muted)">Para: <span style="user-select:text;color:var(--ink)">'+esc(c.contacto?c.contacto+" · ":"")+esc(c.email)+'</span></p>';
+  if(M.done){box.innerHTML=h+'<div class="health good"><div><b>Borrador creado en Outlook</b>Está en tu carpeta Borradores. Revísalo y envíalo desde Outlook.'+(M.done.extra?'<ul>'+M.done.extra.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':"")+'</div></div><div class="btnrow" style="margin-top:12px">'+'<a class="btn" href="ms-outlook://emails" style="text-decoration:none">Ver borrador en la app de Outlook</a>'+(M.done.link?'<a class="btn ghost" href="'+esc(M.done.link)+'" target="_blank" rel="noopener" style="text-decoration:none">En el navegador ↗</a>':"")+'<button class="btn ghost" data-act="close">Hecho</button></div><p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">En la app lo tienes en la carpeta Borradores. Si el botón no abre la app, ábrela tú: el borrador ya está sincronizado.</p>';return}
+  if(!M.mode){
+    h+='<div class="choose"><button data-act="mailNew">'+ic("cal")+'<div><b>Nuevo correo para pedir visita</b><span>Claude propone los días en los que tu Outlook está más libre</span></div></button></div>';
+    h+='<div class="sec" style="margin-top:18px"><div class="sec-h"><span class="eyebrow">Últimos correos con el cliente</span>'+(M.state==="ok"?'<button class="link" data-act="mailReload">Actualizar</button>':"")+'</div><div class="list">';
+    if(M.state==="loading")h+='<div class="empty">Buscando en tu correo de Outlook…</div>';
+    else if(M.state!=="ok")h+='<div class="empty">'+esc(M.msg)+'</div>';
+    else if(!M.list.length)h+='<div class="empty">No hay correos recientes con '+esc(domainOf(c.email)||c.email)+'.</div>';
+    else h+=M.list.map((m,i)=>{const mine=/@grupotrimodos|@stinsa|@transargi/i.test(m.sender||"")||/^\/O=/i.test(m.sender||"");const d=String(m.receivedDateTime||m.sentDateTime||"").slice(0,10);
+      return '<div class="row" style="flex-direction:column;gap:6px"><div style="display:flex;gap:8px;width:100%;align-items:baseline"><span class="t" style="flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere">'+esc(m.subject||"(sin asunto)")+'</span><span class="pill">'+(d?relDay(d):"")+'</span></div><span class="s" style="font-size:13px;color:var(--muted)">'+(mine?"Enviado por ti":"De "+esc(mailFrom(m)))+(m.hasAttachments?" · adjuntos":"")+'</span><span class="s" style="font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+esc(String(m.summary||""))+'</span><div class="btnrow"><button class="btn small" data-act="mailFu" data-i="'+i+'">Responder con seguimiento</button>'+(m.webLink?'<a class="btn small ghost" href="'+esc(m.webLink)+'" target="_blank" rel="noopener" style="text-decoration:none">Abrir ↗</a>':"")+'</div></div>'}).join("");
+    h+='</div></div><div class="btnrow" style="margin-top:12px"><button class="btn ghost" data-act="close">Cerrar</button></div>';
+    box.innerHTML=h;return}
+  const fu=M.mode.kind==="fu";
+  h+='<div class="health '+(fu?"warn":"good")+'" style="margin-bottom:12px"><div><b>'+(fu?"Seguimiento de: "+esc(M.mode.msg.subject||"(sin asunto)"):"Petición de visita")+'</b>'+(fu?"Se creará una respuesta en el mismo hilo, con el correo original citado.":"Se creará un correo nuevo para "+esc(c.email)+".")+'</div></div>';
+  h+='<form class="f" id="fMail">';
+  h+='<div class="fld"><label for="mailHint">Indicaciones para Claude (opcional)</label><input id="mailHint" value="'+esc(M.hint)+'" placeholder="'+(fu?"Ej.: recordar que esperamos su respuesta a la oferta":"Ej.: presentar el nuevo servicio de tren a Madrid")+'"></div>';
+  h+='<div class="btnrow"><button type="button" class="btn ghost" data-act="mailGen"'+(M.gen==="busy"?" disabled":"")+'>'+(M.gen==="busy"?"Claude está redactando…":M.body?"Volver a redactar con Claude":"Redactar con Claude")+'</button></div>'+(M.genMsg?'<div class="err">'+esc(M.genMsg)+'</div>':"");
+  if(!fu)h+='<div class="fld"><label for="mailSubj">Asunto</label><input id="mailSubj" value="'+esc(M.subj)+'" required></div>';
+  h+='<div class="fld"><label for="mailBody">Texto</label><textarea id="mailBody" style="min-height:180px" required placeholder="Escríbelo tú o pulsa «Redactar con Claude»">'+esc(M.body)+'</textarea></div>';
+  h+='<fieldset><legend>Después</legend><div style="display:flex;gap:8px;align-items:center;font-size:14px;flex-wrap:wrap"><input type="checkbox" id="mailRem"'+(M.remind?" checked":"")+'><label for="mailRem">Recordarme comprobar la respuesta en</label><select id="mailRemD" style="border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 6px">'+[2,3,5,7,10].map(n=>'<option value="'+n+'"'+(n===M.remindDays?" selected":"")+'>'+n+' días</option>').join("")+'</select></div>'+(M.aid?'<label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="mailClose"'+(M.closeAct?" checked":"")+'> Marcar la acción como hecha</label>':"")+'</fieldset>';
+  h+='<div class="err" id="fErr" hidden></div><div class="btnrow"><button class="btn" type="submit">Crear borrador en Outlook</button><button class="btn ghost" type="button" data-act="mailBack">Atrás</button></div><p style="margin:0;font-size:12.5px;color:var(--muted)">No se envía nada: el correo queda en Borradores para que lo revises y lo envíes tú.</p></form>';
+  box.innerHTML=h}
+async function loadMails(force){const M=S.mail;if(!M)return;const c=cliente(M.cid);if(!c||!c.email)return;
+  if(!S.graph){M.state="error";M.msg="Outlook no está disponible en el modo de pruebas.";renderMail();return}
+  M.state="loading";renderMail();
+  const d=domainOf(c.email);const who=d&&!PUBLIC_DOM.test(d)?d:c.email;
+  const sel="&$top=15&$select=id,subject,from,receivedDateTime,sentDateTime,bodyPreview,webLink,hasAttachments,isDraft";
+  const buscar=q=>graph("/me/messages?$search="+encodeURIComponent('"'+q+'"')+sel);
+  let vals;
+  try{vals=(await buscar("participants:"+who)).value||[];if(!vals.length)vals=(await buscar(who)).value||[]}
+  catch(e){if(S.mail!==M)return;M.state="error";M.msg=e.msg||"No se ha podido buscar en tu correo.";renderMail();return}
+  if(S.mail!==M)return;
+  const list=vals.filter(m=>m&&m.id&&!m.isDraft).map(m=>{const f=(m.from&&m.from.emailAddress)||{};return{id:m.id,subject:m.subject,sender:f.address||"",senderName:f.name||f.address||"",receivedDateTime:m.receivedDateTime,sentDateTime:m.sentDateTime,summary:m.bodyPreview||"",webLink:m.webLink||"",hasAttachments:!!m.hasAttachments}});
+  list.sort((a,b)=>String(b.receivedDateTime||b.sentDateTime||"")<String(a.receivedDateTime||a.sentDateTime||"")?-1:1);
+  M.list=list.slice(0,6);M.state="ok";renderMail()}
+async function freeDays(){if(!S.graph)return[];
+  const a=addDays(TODAY,2),b=addDays(TODAY,30);const n={};
+  try{const j=await graph("/me/calendarView?startDateTime="+a+"T00:00:00&endDateTime="+b+"T00:00:00&$top=250&$select=start,showAs,isCancelled",{headers:{Prefer:'outlook.timezone="Europe/Madrid"'}});
+    for(const e of j.value||[]){if(e.isCancelled||e.showAs==="free")continue;const d=String((e.start&&e.start.dateTime)||"").slice(0,10);n[d]=(n[d]||0)+1}}catch(e){return[]}
+  const out=[];let d=a,g=0;while(out.length<8&&g<20){const w=parse(d).getDay();if(w>0&&w<6)out.push({d,n:n[d]||0});d=addDays(d,1);g++}
+  return out.sort((x,y)=>x.n-y.n||(x.d<y.d?-1:1)).slice(0,3).sort((x,y)=>x.d<y.d?-1:1).map(x=>fDate(x.d)+(x.n?" ("+x.n+" citas)":" (libre)"))}
+const nombrePropio=t=>String(t||"").toLowerCase().replace(/(^|[\s-])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+function ctxCliente(c){const re=S.re.filter(r=>r.clienteId===c.id&&r.fecha<=TODAY).sort((a,b)=>a.fecha<b.fecha?1:-1).slice(0,2);
+  const ac=S.ac.filter(a=>a.clienteId===c.id&&!a.hecha).map(a=>a.titulo);const op=S.op.filter(o=>o.clienteId===c.id&&!/ganad|perdid/i.test(o.etapa||"")).map(o=>o.nombre+" ("+o.etapa+")");
+  return["Cliente: "+c.nombre.replace(/\s*\(ejemplo\)/i,""),"Sector: "+(c.sector||"-")+", "+(c.ciudad||""),"Contacto: "+(c.contacto||"-")+(c.cargo?" ("+c.cargo+")":""),
+   re.length?"Últimas reuniones: "+re.map(r=>fDate(r.fecha)+": "+(r.resumen||"")+(r.resultado?" Resultado: "+r.resultado:"")).join(" | "):"Sin reuniones registradas",
+   ac.length?"Acciones pendientes: "+ac.join("; "):"",op.length?"Oportunidades abiertas: "+op.join("; "):"",c.notas?"Notas: "+c.notas:""].filter(Boolean).join("\n")}
+async function genMail(){const M=S.mail;if(!M||M.gen==="busy")return;const c=cliente(M.cid);
+  M.gen="busy";M.genMsg="";renderMail();
+  const firma=nombrePropio(S.meName);const fu=M.mode.kind==="fu";let orig="";
+  if(fu){const m=M.mode.msg;orig="Asunto: "+(m.subject||"")+"\nDe: "+mailFrom(m)+"\nFecha: "+String(m.receivedDateTime||"").slice(0,10)+"\n";
+    try{const r=await graph("/me/messages/"+encodeURIComponent(m.id)+"?$select=body,uniqueBody",{headers:{Prefer:'outlook.body-content-type="text"'}});orig+=String((r.uniqueBody&&r.uniqueBody.content)||(r.body&&r.body.content)||m.summary||"").replace(/[ \t]+/g," ").slice(0,5000)}catch(e){orig+=m.summary||""}}
+  const libres=fu?[]:await freeDays();
+  const prompt="Eres el asistente comercial de una empresa de transporte por carretera, tren y logística de Castellón (España). Redacta un correo en español de España, tono profesional y cercano, breve (máximo 130 palabras), sin inventar cifras, precios ni compromisos que no estén en los datos.\n\n"+
+   (fu?"OBJETIVO: correo de seguimiento como respuesta al último correo del hilo. Retoma lo pendiente y propone un siguiente paso concreto.\n\nCORREO ORIGINAL:\n"+orig:"OBJETIVO: pedir una visita presencial al cliente para revisar el servicio y conocer sus próximas necesidades."+(libres.length?" Propón estos días, en los que mi agenda está más libre: "+libres.join(", ")+".":" Pide que nos indiquen su disponibilidad la próxima semana."))+
+   "\n\nDATOS DEL CRM:\n"+ctxCliente(c)+(M.hint?"\n\nINDICACIONES DEL USUARIO: "+M.hint:"")+
+   "\n\nSaluda a "+(c.contacto?c.contacto.split(" ")[0]:"el contacto")+" por su nombre. "+(firma?"Firma como "+firma+".":"No pongas firma.")+" No uses markdown.\nDevuelve SOLO un JSON con esta forma: {\"asunto\": \"...\", \"cuerpo\": \"...\"} donde cuerpo es texto plano con saltos de línea \\n entre párrafos.";
+  try{const j=await post({op:"redactar",args:{prompt}});if(S.mail!==M)return;M.body=String(j&&j.cuerpo||"").trim();if(!fu)M.subj=String(j&&j.asunto||M.subj||"").trim();M.gen="idle";if(!M.body)M.genMsg="Claude no ha devuelto texto. Inténtalo de nuevo o escríbelo tú."}
+  catch(e){if(S.mail!==M)return;M.gen="idle";M.genMsg=(e&&e.msg?e.msg+" ":"")+"Puedes escribir el texto tú."}
+  renderMail()}
+const toHtml=t=>String(t).trim().split(/\n\s*\n/).map(p=>"<p>"+esc(p).replace(/\n/g,"<br>")+"</p>").join("");
+async function submitMail(){const M=S.mail;const c=cliente(M.cid);const btn=$("#fMail [type=submit]");const err=$("#fErr");
+  M.body=($("#mailBody")||{}).value||"";if($("#mailSubj"))M.subj=$("#mailSubj").value;
+  if(!M.body.trim()||(M.mode.kind!=="fu"&&!M.subj.trim())){err.textContent="Falta "+(M.body.trim()?"el asunto":"el texto")+" del correo.";err.hidden=false;return}
+  btn.disabled=true;btn.textContent="Creando borrador…";
+  let res;try{
+    if(M.mode.kind==="fu"){const dr=await graph("/me/messages/"+encodeURIComponent(M.mode.msg.id)+"/createReply",{method:"POST",body:{}});
+      let html=(dr.body&&dr.body.content)||"";const ins="<div>"+toHtml(M.body)+"</div>";
+      html=/<body[^>]*>/i.test(html)?html.replace(/<body[^>]*>/i,x=>x+ins):ins+html;
+      await graph("/me/messages/"+encodeURIComponent(dr.id),{method:"PATCH",body:{body:{contentType:"HTML",content:html}}});res=dr}
+    else res=await graph("/me/messages",{method:"POST",body:{subject:M.subj.trim(),body:{contentType:"HTML",content:toHtml(M.body)},toRecipients:[{emailAddress:{address:c.email,name:c.contacto||c.email}}]}})}
+  catch(e){err.textContent=e.msg||"No se ha podido crear el borrador.";err.hidden=false;btn.disabled=false;btn.textContent="Crear borrador en Outlook";return}
+  const extra=[];const subj=M.mode.kind==="fu"?"Re: "+(M.mode.msg.subject||""):M.subj.trim();
+  if(M.remind){const f=addDays(TODAY,M.remindDays);if(await save("acciones",null,{clienteId:c.id,titulo:"Comprobar respuesta: "+subj.slice(0,80),tipo:"Email",fecha:f,prioridad:"normal",hecha:false,nota:"Correo preparado el "+fDate(TODAY),creado:new Date().toISOString()}))extra.push("Recordatorio en tu agenda para el "+fDate(f))}
+  if(M.aid&&M.closeAct){if(await save("acciones",M.aid,{hecha:true,hechaEl:TODAY},true))extra.push("Acción marcada como hecha")}
+  M.done={link:(res&&res.webLink)||"",extra};renderMail()}
+
+// ---------- Mi cuenta ----------
+function sheetPerfil(){const ms=ACCOUNT?ACCOUNT.username:(DEVKEY?"Modo de pruebas":"–");
+  openSheet('<h3>Mi cuenta</h3><dl class="facts"><dt>Nombre</dt><dd>'+esc(nombrePropio(S.meName)||"–")+'</dd><dt>Microsoft 365</dt><dd>'+esc(ms)+'</dd><dt>Usuario de Odoo</dt><dd>'+esc(S.me||"–")+'</dd><dt>Empresas</dt><dd>'+esc(CFG.empresas.join(", "))+'</dd><dt>Versión</dt><dd class="num">'+VER+'</dd></dl>'+
+  '<p style="font-size:13px;color:var(--muted);margin:12px 0">Lo que guardas va a Odoo a tu nombre. Las citas y los borradores de correo se crean en tu Outlook. Para sumar a un compañero, pásale el enlace de la app: entra con su cuenta de Microsoft y ve sus empresas de Odoo.</p>'+
+  '<div class="btnrow"><button class="btn ghost" data-act="reOdoo">Actualizar datos de Odoo</button><button class="btn ghost" data-act="logout">Cerrar sesión</button></div>')}
+
+// ---------- Escrituras ----------
+let toastT;function toast(m){clearTimeout(toastT);let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}t.textContent=m;t.hidden=false;toastT=setTimeout(()=>{t.hidden=true},2600)}
+// ---------- Odoo (API de n8n) ----------
+const sid=v=>v==null||v===false?"":String(v);
+const RCACHE={staleTime:120000};
+// Petición a la API. Se identifica con la sesión de Microsoft (o con la clave de pruebas).
+async function post(body,retry){const h={"Content-Type":"application/json"};
+  if(DEVKEY)h["X-Clave-Pruebas"]=DEVKEY;else h.Authorization="Bearer "+await token(!!retry);
+  let r;try{r=await fetch(CONF.api,{method:"POST",headers:h,body:JSON.stringify(body)})}
+  catch(e){throw{msg:navigator.onLine===false?"Sin conexión a internet.":"No se ha podido conectar con el servidor del CRM."}}
+  if(r.status===401&&!retry&&!DEVKEY)return post(body,true);
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j)throw{msg:(j&&j.error)||("El servidor del CRM ha respondido con un error ("+r.status+")."),sinUsuario:!!(j&&j.sin_usuario)};
+  if(j.error)throw{msg:j.error,sinUsuario:!!j.sin_usuario};return j}
+// Las peticiones que salen a la vez viajan juntas en un solo «lote» (menos ejecuciones en n8n).
+const COLA=[];let colaT=null;
+function api(op,args){return new Promise((res,rej)=>{COLA.push({op,args:args||{},res,rej});if(!colaT)colaT=setTimeout(vaciar,30)})}
+async function vaciar(){colaT=null;const q=COLA.splice(0,12);if(COLA.length)colaT=setTimeout(vaciar,0);if(!q.length)return;
+  if(q.length===1){const x=q[0];try{x.res(await post({op:x.op,args:x.args}))}catch(e){x.rej(e)}return}
+  let r;try{r=await post({op:"lote",args:{ops:q.map(x=>({op:x.op,args:x.args}))}})}catch(e){q.forEach(x=>x.rej(e));return}
+  const rs=(r&&r.resultados)||[];
+  q.forEach((x,i)=>{const v=rs[i];if(!v)x.rej({msg:"Respuesta incompleta de Odoo."});else if(v.error)x.rej({msg:v.error,sinUsuario:!!v.sin_usuario});else x.res(v)})}
+const MEM={};
+async function od(tool,args,opts){const op=tool.replace(/^(crm|odoo)_/,"");const c=opts&&opts.cache;
+  const key=c?op+"|"+JSON.stringify(args):null;
+  if(key&&!c.refresh){const m=MEM[key];if(m&&Date.now()-m.t<(c.staleTime||0))return m.v}
+  const v=await api(op,args);if(key)MEM[key]={t:Date.now(),v};return v}
+function nombreDe(c){if(c&&c.login){const l=String(c.login).toLowerCase();if(c.nombre)S.names[l]=c.nombre;return l}return""}
+const limpiaNota=n=>String(n||"").split("\n").filter(l=>!/^Registrado desde el CRM móvil/.test(l)).join("\n").trim();
+let odSeq=0;
+async function cargarOdoo(fresh){
+  if(!S.me)return;const emp=S.emp,seq=++odSeq;
+  S.od={state:S.RAW.cl.length?"refresh":"loading",msg:""};if(!S.sheet)render();
+  const c=fresh?{...RCACHE,refresh:true}:RCACHE;
+  try{
+    const [cl,ac,re,op,co]=await Promise.all([
+      od("crm_listar_clientes",{empresa:emp,limite:500},{cache:c}),
+      od("crm_listar_actividades",{empresa:emp,incluir_hechas:true},{cache:c}),
+      od("crm_listar_reuniones",{empresa:emp,desde:addDays(TODAY,-365)},{cache:c}),
+      od("crm_listar_oportunidades",{empresa:emp},{cache:c}),
+      od("crm_listar_comerciales",{empresa:emp},{cache:c})]);
+    if(seq!==odSeq||emp!==S.emp)return;
+    aplicar(emp,cl,ac,re,op,co);
+    try{localStorage.setItem(snapKey(emp),JSON.stringify({t:Date.now(),cl,ac,re,op,co}))}catch(e){}
+    S.od={state:"ok",msg:""};applyFilter();if(!S.sheet)render();
+  }catch(e){if(seq!==odSeq)return;if(e&&e.sinUsuario){S.auth={state:"nouser",msg:e.msg};S.me=null}S.od={state:"error",msg:e.msg||"No se ha podido leer Odoo."};if(!S.sheet)render()}
+}
+const snapKey=emp=>"crm.snap."+emp+"."+(S.me||"");
+function snapLoad(emp){try{const x=JSON.parse(localStorage.getItem(snapKey(emp))||"null");if(x&&x.cl){aplicar(emp,x.cl,x.ac,x.re,x.op,x.co);applyFilter();return true}}catch(e){}return false}
+function aplicar(emp,cl,ac,re,op,co){
+    S.RAW.cl=(cl.clientes||[]).map(x=>{const prev=S.RAW.cl.find(y=>y.id===sid(x.id))||{};return{id:sid(x.id),nombre:x.nombre,sector:x.sector||"",ciudad:x.ciudad||"",direccion:x.direccion||"",
+      telefono:x.telefono||x.contacto_telefono||"",movil:x.movil||x.contacto_movil||"",email:x.contacto_email||x.email||"",contacto:x.contacto||"",cargo:x.cargo||"",
+      responsable:nombreDe(x.comercial),empresa:emp,odooRef:x.ref_odoo||"",notas:prev.notas,contactos:prev.contactos}});
+    S.RAW.ac=(ac.actividades||[]).map(a=>{let nota=limpiaNota(a.nota),prio="normal";if(/^Prioridad alta\.?\s*/.test(nota)){prio="alta";nota=nota.replace(/^Prioridad alta\.?\s*/,"")}
+      return{id:sid(a.id),clienteId:sid(a.cliente_id),oportunidadId:sid(a.oportunidad_id),titulo:a.titulo,tipo:a.tipo,fecha:a.fecha,hecha:!!a.hecha,nota,prioridad:prio,autor:nombreDe(a.comercial)}});
+    S.RAW.re=(re.reuniones||[]).map(r=>({id:sid(r.id),clienteId:sid(r.cliente_id),fecha:r.fecha,hora:r.hora,tipo:r.tipo,asistentes:r.asistentes,resumen:r.resumen,resultado:r.resultado,autor:nombreDe(r.comercial)}));
+    S.RAW.op=(op.oportunidades||[]).map(o=>({id:sid(o.id),clienteId:sid(o.cliente_id),nombre:o.nombre,importe:o.importe,probabilidad:o.probabilidad,etapa:o.perdida?"Perdida":o.etapa,cierre:o.cierre,autor:nombreDe(o.comercial)}));
+    S.comerciales=(co.comerciales||[]).map(nombreDe).filter(Boolean);
+}
+async function cargarCartera(d,h,fresh){const k=cartKey(d,h);const x=S.cart[k];if(x&&!fresh&&x.state!=="error")return;
+  S.cart[k]={state:"loading"};
+  try{const r=await od("crm_kpis_cartera",{empresa:S.emp,desde:d,hasta:h},{cache:fresh?{...RCACHE,refresh:true}:RCACHE});const map={};(r.clientes||[]).forEach(c=>map[sid(c.partner_id)]=c);S.cart[k]={state:"ok",data:r,map}}
+  catch(e){S.cart[k]={state:"error",msg:e.msg||"Error"}}
+  if(!S.sheet)render()}
+async function cargarFicha(cid){const k=S.emp+"|"+cid;if(S.fiState[k])return;S.fiState[k]="loading";
+  try{const fi=await od("crm_ficha_cliente",{empresa:S.emp,partner_id:Number(cid)},{cache:RCACHE});const c=S.RAW.cl.find(x=>x.id===String(cid));if(c){c.notas=fi.notas||"";c.contactos=fi.contactos||[]}S.fiState[k]="ok"}
+  catch(e){S.fiState[k]="error"}
+  if(!S.sheet)render()}
+async function cargarKpis(cid,fresh){const k=S.emp+"|"+cid;if(S.kpState[k]==="loading")return;S.kpState[k]="loading";if(!S.sheet)render();
+  const c0=fresh?{...RCACHE,refresh:true}:RCACHE;
+  try{const [kp,fi]=await Promise.all([od("crm_kpis_cliente",{empresa:S.emp,partner_id:Number(cid),desde:monthAdd(CUR,-23),hasta:CUR},{cache:c0}),od("crm_ficha_cliente",{empresa:S.emp,partner_id:Number(cid)},{cache:c0})]);
+    S.kp[k]={meses:kp.meses||[],pendiente:kp.pendiente,vencido:kp.vencido,diasCobro:kp.dias_cobro,formaPago:[kp.forma_pago,kp.plazo_pago].filter(Boolean).join(" · ")};
+    const c=S.RAW.cl.find(x=>x.id===String(cid));if(c){c.notas=fi.notas||"";c.contactos=fi.contactos||[]}S.fiState[k]="ok";
+    S.kpState[k]="ok"}catch(e){S.kpState[k]="error:"+(e.msg||"")}
+  if(!S.sheet)render()}
+async function save(col,id,data,merge){
+  if(!S.me){toast("Entra con tu cuenta para guardar.");return false}
+  const base={empresa:S.emp,user_login:S.me};let r;
+  try{
+    if(col==="acciones"){
+      if(!id)r=await od("crm_crear_actividad",{...base,tipo:data.tipo||"Tarea",titulo:data.titulo,fecha:data.fecha,partner_id:Number(data.clienteId),nota:(data.prioridad==="alta"?"Prioridad alta. ":"")+(data.nota||"")});
+      else if(data.hecha===true){if(String(id).startsWith("m"))return id;r=await od("crm_marcar_hecha",{...base,id:Number(id),comentario:data.comentario||""})}
+      else if(data.hecha===false){toast("En Odoo no se puede reabrir una acción hecha. Crea una nueva.");await cargarOdoo(true);return false}
+      else{const a={...base,id:Number(id)};if(data.fecha)a.fecha=data.fecha;if(data.titulo)a.titulo=data.titulo;if(data.tipo)a.tipo=data.tipo;if("nota" in data||"prioridad" in data)a.nota=(data.prioridad==="alta"?"Prioridad alta. ":"")+(data.nota||"");r=await od("crm_actualizar_actividad",a)}}
+    else if(col==="reuniones")r=await od("crm_registrar_reunion",{...base,partner_id:Number(data.clienteId),fecha:data.fecha,tipo:data.tipo||"Visita",hora:data.hora||"09:00",duracion:Number(data.duracion)||60,asistentes:data.asistentes||"",resumen:data.resumen||"",resultado:data.resultado||""});
+    else if(col==="oportunidades"){
+      if(/perdid/i.test(data.etapa||"")&&id)r=await od("crm_marcar_perdida",{...base,id:Number(id)});
+      else{const a={...base,partner_id:Number(data.clienteId),nombre:data.nombre,importe:Number(data.importe)||0,probabilidad:Number(data.probabilidad)||0,etapa:data.etapa||"Nueva"};if(data.cierre)a.cierre=data.cierre;if(id)a.id=Number(id);r=await od("crm_guardar_oportunidad",a)}}
+    else if(col==="clientes"){const a={...base,nombre:data.nombre};for(const k of["sector","ciudad","direccion","telefono","movil","email","contacto","cargo","notas"])a[k]=data[k]||"";if(data.responsable)a.responsable_login=data.responsable;if(id)a.id=Number(id);r=await od("crm_guardar_cliente",a)}
+  }catch(e){toast(e.msg||"No se ha podido guardar en Odoo.");return false}
+  await cargarOdoo(true);
+  return sid(r&&r.id)||id||true;
+}
+const fd=f=>Object.fromEntries(new FormData(f).entries());
+function needCli(d){if(!d.clienteId){const e=$("#fErr");e.textContent="Elige un cliente.";e.hidden=false;return false}return true}
+const WHEN={"Mañana":1,"En 3 días":3,"En 1 semana":7,"En 2 semanas":14,"En 1 mes":30};
+
+document.addEventListener("submit",async ev=>{
+  const f=ev.target;ev.preventDefault();if(f.id==="fMail"){submitMail();return}
+  const d=fd(f);const btn=f.querySelector("[type=submit]");if(btn)btn.disabled=true;
+  let ok=false;const now=new Date().toISOString();
+  const wantOl=d.ol==="1"&&S.graph;let olOk=false;
+  async function olFor(subject,body){const c=cliente(d.clienteId)||{};if(btn)btn.textContent="Añadiendo a Outlook…";
+    const r=await addToOutlook({fecha:d.fecha,hora:d.olHora,dur:d.olDur,subject,body,location:c.direccion||c.ciudad||"",invite:d.olInv==="1",email:c.email,name:c.contacto});
+    if(!r.ok)toast("Guardado en el CRM, pero no en Outlook: "+r.msg);return r}
+  if(f.id==="fReu"){if(!needCli(d)){btn.disabled=false;return}
+    const c=cliente(d.clienteId)||{};let olLink=d.olLink||"";
+    if(wantOl){const r=await olFor((d.tipo||"Reunión")+" · "+String(c.nombre||"").replace(/\s*\(ejemplo\)/i,""),[d.asistentes&&"Con: "+d.asistentes,d.resumen].filter(Boolean).join("\n\n"));if(r.ok){olLink=r.link||"";olOk=true}}
+    ok=await save("reuniones",null,{clienteId:d.clienteId,fecha:d.fecha,hora:d.olHora||"09:00",duracion:d.olDur||60,tipo:d.tipo||"Visita",asistentes:d.asistentes||"",resumen:d.resumen||"",resultado:d.resultado||"",olLink,creado:now});
+    if(ok&&d.next&&d.next.trim())await save("acciones",null,{clienteId:d.clienteId,titulo:d.next.trim(),tipo:"Llamada",fecha:addDays(d.fecha>TODAY?d.fecha:TODAY,WHEN[d.nextWhen]||7),prioridad:"normal",hecha:false,origen:ok,creado:now});
+    if(ok)toast((olOk?"En el CRM y en Outlook":"Reunión guardada")+(d.next&&d.next.trim()?" · siguiente paso en la agenda":""));}
+  else if(f.id==="fAcc"){if(!needCli(d)){btn.disabled=false;return}
+    const data={clienteId:d.clienteId,titulo:d.titulo.trim(),tipo:d.tipo||"Tarea",fecha:d.fecha,prioridad:d.prioridad||"normal",nota:d.nota||""};
+    if(wantOl){const c=cliente(d.clienteId)||{};const r=await olFor(data.tipo+" · "+String(c.nombre||"").replace(/\s*\(ejemplo\)/i,"")+": "+data.titulo,data.nota);if(r.ok){data.olLink=r.link||"";data.enOutlook=true;olOk=true}}
+    if(d.id)ok=await save("acciones",d.id,data,true);else ok=await save("acciones",null,Object.assign(data,{hecha:false,creado:now}));
+    if(ok)toast((olOk?"Guardada y añadida a Outlook":d.id?"Acción actualizada":"Acción añadida"));}
+  else if(f.id==="fOp"){if(!needCli(d)){btn.disabled=false;return}
+    const data={clienteId:d.clienteId,nombre:d.nombre.trim(),importe:+d.importe||0,probabilidad:Math.min(100,Math.max(0,+d.probabilidad||0)),etapa:d.etapa||"Nueva",cierre:d.cierre||""};
+    if(/ganad/i.test(data.etapa))data.probabilidad=100;if(/perdid/i.test(data.etapa))data.probabilidad=0;
+    ok=d.id?await save("oportunidades",d.id,data,true):await save("oportunidades",null,data);if(ok)toast("Oportunidad guardada");}
+  else if(f.id==="fCl"){const data={};for(const k of["nombre","sector","ciudad","contacto","cargo","telefono","movil","email","direccion","comercial","odooRef","notas","responsable"])data[k]=(d[k]||"").trim();if(!d.id)data.empresa=S.emp;
+    ok=d.id?await save("clientes",d.id,data,true):await save("clientes",null,data);
+    if(ok){toast("Cliente guardado");if(!d.id){closeSheet();go("cliente",ok);return}}}
+  if(ok)closeSheet();else if(btn)btn.disabled=false;
+});
+
+// ---------- Navegación ----------
+function go(view,cid,tab){S.view=view;if(cid)S.cid=cid;if(tab)S.tab=tab;else if(view==="cliente"&&cid)S.tab="acciones";
+  const h=view==="cliente"?"cliente-"+S.cid:view;if(location.hash.slice(1)!==h){try{history.pushState(null,"","#"+h)}catch(e){location.hash=h}}
+  render();window.scrollTo(0,0)}
+function fromHash(){const h=location.hash.slice(1);if(h.startsWith("cliente-")){S.view="cliente";S.cid=h.slice(8)}else if(["hoy","clientes","agenda","cartera"].includes(h))S.view=h;else S.view="hoy";render()}
+window.addEventListener("hashchange",fromHash);window.addEventListener("popstate",fromHash);
+
+document.addEventListener("click",async ev=>{
+  {const ae=document.activeElement;if(campoEnPantalla(ae)&&ev.target!==ae&&!ae.contains(ev.target)&&!(ev.target.closest&&ev.target.closest("label")&&ev.target.closest("label").htmlFor===ae.id)){try{ae.blur()}catch(e){}}}
+  const el=ev.target.closest("[data-act],[data-go],[data-cli],[data-per],[data-sort],[data-tab2],[data-agt],[data-emp]");if(!el)return;
+  if(el.dataset.agt){S.agTab=el.dataset.agt;render();return}
+  if(el.dataset.emp){S.emp=el.dataset.emp;try{localStorage.setItem("crm.emp",S.emp)}catch(e){}S.RAW={cl:[],re:[],ac:[],op:[]};S.quien="todos";if(!snapLoad(S.emp))applyFilter();if(S.view==="cliente")go("clientes");else render();cargarOdoo();return}
+  if(el.dataset.cli){closeSheet();go("cliente",el.dataset.cli,el.dataset.tab);return}
+  if(el.dataset.go){closeSheet();go(el.dataset.go);return}
+  if(el.dataset.per){S.per=el.dataset.per;render();return}
+  if(el.dataset.sort){S.sort=el.dataset.sort;render();return}
+  if(el.dataset.tab2){S.tab=el.dataset.tab2;render();return}
+  const id=el.dataset.id;const act=el.dataset.act;
+  switch(act){
+    case"back":if(history.length>1){history.back()}else go("clientes");break;
+    case"close":closeSheet();break;
+    case"add":sheetAdd();break;
+    case"newReunion":closeSheet();sheetReunion();break;
+    case"newAccion":closeSheet();sheetAccion();break;
+    case"newOport":closeSheet();sheetOport();break;
+    case"newCliente":closeSheet();sheetCliente();break;
+    case"editCliente":sheetCliente(cliente(S.cid));break;
+    case"actMenu":{const a=S.ac.find(x=>x.id===id);if(a)sheetActMenu(a);break}
+    case"editAccion":{const a=S.ac.find(x=>x.id===id);if(a){closeSheet();sheetAccion(a)}break}
+    case"oppMenu":{const o=S.op.find(x=>x.id===id);if(o)sheetOport(o);break}
+    case"toggle":{const a=S.ac.find(x=>x.id===id);if(a){const v=!a.hecha;a.hecha=v;render();const ok=await save("acciones",id,{hecha:v,hechaEl:v?TODAY:""},true);if(ok&&v)toast("Hecha. ¿Siguiente paso? Pulsa + para añadirlo")}break}
+    case"done":{closeSheet();const a=S.ac.find(x=>x.id===id);if(a){a.hecha=true;render();if(await save("acciones",id,{hecha:true,hechaEl:TODAY},true))toast("Acción completada")}break}
+    case"snooze":{const n=+el.dataset.d;closeSheet();if(await save("acciones",id,{fecha:addDays(TODAY,n)},true))toast("Pospuesta a "+fDate(addDays(TODAY,n)));break}
+    case"reOdoo":closeSheet();S.cart={};S.kpState={};S.fiState={};for(const k in MEM)delete MEM[k];cargarOdoo(true);break;
+    case"verKpis":cargarKpis(S.cid);break;
+    case"login":login();break;
+    case"logout":closeSheet();logout();break;
+    case"retryYo":S.auth={state:"ok",msg:""};S.me=null;render();quienSoy();break;
+    case"reKpis":cargarKpis(S.cid,true);break;
+    case"reCart":for(const k of Object.keys(S.cart))if(S.cart[k].state==="error")delete S.cart[k];render();break;
+    case"noPhone":toast("Este cliente no tiene teléfono. Añádelo en Editar cliente.");break;
+    case"perfil":sheetPerfil();break;
+    case"mail":{const cid=el.dataset.cid||S.cid;closeSheet();if(!S.graph){toast("Outlook no está disponible en el modo de pruebas");break}if(cid)sheetMail(cid,el.dataset.id);break}
+    case"mailReload":loadMails(true);break;
+    case"mailNew":S.mail.mode={kind:"new"};S.mail.subj="";S.mail.body="";renderMail();genMail();break;
+    case"mailFu":{const m=S.mail.list&&S.mail.list[+el.dataset.i];if(m){S.mail.mode={kind:"fu",msg:m};S.mail.body="";renderMail();genMail()}break}
+    case"mailGen":genMail();break;
+    case"mailBack":S.mail.mode=null;S.mail.genMsg="";renderMail();break;
+    case"editCliente2":{const c=cliente(id);closeSheet();if(c)sheetCliente(c);break}
+    case"copy":{const v=el.dataset.v;if(!v){toast("No hay dato guardado");break}
+      try{await navigator.clipboard.writeText(v);toast("Copiado: "+v)}catch(e){toast(v)}break}
+  }
+});
+document.addEventListener("input",ev=>{
+  if(S.mail){const t=ev.target.id;if(t==="mailHint")S.mail.hint=ev.target.value;else if(t==="mailSubj")S.mail.subj=ev.target.value;else if(t==="mailBody")S.mail.body=ev.target.value;}
+  if(ev.target.id==="q"){S.q=ev.target.value;const t=document.createElement("div");t.innerHTML=vClientes();const n=t.querySelector("#clist"),o=$("#clist");if(n&&o)o.innerHTML=n.innerHTML}
+});
+document.addEventListener("change",ev=>{
+  if(ev.target.tagName==="SELECT"&&!ev.target.closest("#layer")){try{ev.target.blur()}catch(e){}}
+  if(ev.target.id==="quien"){S.quien=ev.target.value;applyFilter();render();return}
+  if(ev.target.id==="perSel"){S.per=ev.target.value;render();return}
+  if(ev.target.id==="cFrom"||ev.target.id==="cTo"){if(!S.cFrom)S.cFrom=monthAdd(CUR,-5);if(!S.cTo)S.cTo=CUR;S[ev.target.id]=ev.target.value;if(S.cFrom>S.cTo){const t=S.cFrom;S.cFrom=S.cTo;S.cTo=t}render();return}
+  if(!S.mail)return;const t=ev.target.id;if(t==="mailRem")S.mail.remind=ev.target.checked;else if(t==="mailRemD")S.mail.remindDays=+ev.target.value;else if(t==="mailClose")S.mail.closeAct=ev.target.checked});
+document.addEventListener("focusout",ev=>{if(campoEnPantalla(ev.target)&&renderPend)setTimeout(()=>{if(renderPend&&!campoActivo())render()},60)});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&S.sheet)closeSheet()});
+let drag=null;
+document.addEventListener("touchstart",ev=>{const sh=ev.target.closest&&ev.target.closest(".sheet");if(!sh||ev.touches.length!==1){drag=null;return}
+  const top=!!ev.target.closest(".sh-top");
+  if(!top&&(sh.scrollTop>0||ev.target.closest("textarea,select,input[type=range]"))){drag=null;return}
+  drag={sh,top,y0:ev.touches[0].clientY,t0:Date.now(),dy:0,on:false}},{passive:true});
+document.addEventListener("touchmove",ev=>{if(!drag)return;const dy=ev.touches[0].clientY-drag.y0;
+  if(!drag.on){if(dy>8&&(drag.top||drag.sh.scrollTop<=0)){drag.on=true;drag.sh.classList.remove("back")}else{if(dy<-4)drag=null;return}}
+  drag.dy=Math.max(0,dy);drag.sh.style.transform="translateY("+drag.dy+"px)";if(ev.cancelable)ev.preventDefault()},{passive:false});
+function endDrag(){if(!drag)return;const d=drag;drag=null;if(!d.on)return;d.sh.classList.add("back");
+  const v=d.dy/Math.max(1,Date.now()-d.t0);
+  if(d.dy>110||(d.dy>40&&v>.5)){d.sh.style.transform="translateY(100%)";setTimeout(closeSheet,190)}else{d.sh.style.transform="";setTimeout(()=>d.sh.classList.remove("back"),220)}}
+document.addEventListener("touchend",endDrag);document.addEventListener("touchcancel",endDrag);
+window.addEventListener("scroll",()=>{$("#top").classList.toggle("scrolled",window.scrollY>4)},{passive:true});
+
+// ---------- Arranque ----------
+function usarYo(y){const login=String(y.login||"").toLowerCase();if(!login)return false;
+  const emps=(y.empresas||[]).filter(e=>["STINSA","TRANSARGI"].includes(e));
+  if(!emps.length){S.auth={state:"noemp",msg:""};S.me=null;render();return false}
+  const nuevo=S.me!==login||CFG.empresas.join()!==emps.join();
+  S.me=login;S.meName=y.nombre||"";S.names[login]=y.nombre||login;CFG.empresas=emps;
+  if(!emps.includes(S.emp))S.emp=emps[0];
+  if(nuevo){S.RAW={cl:[],re:[],ac:[],op:[]};if(!snapLoad(S.emp))applyFilter()}
+  return nuevo}
+async function quienSoy(){
+  let y=null;try{y=JSON.parse(localStorage.getItem("crm.yo")||"null")}catch(e){}
+  if(y&&y.login){usarYo(y);render();cargarOdoo()}
+  try{const r=await post({op:"yo",args:{}});try{localStorage.setItem("crm.yo",JSON.stringify(r))}catch(e){}
+    S.auth={state:"ok",msg:""};if(usarYo(r)||!y){render();cargarOdoo()}}
+  catch(e){if(e&&e.sinUsuario){try{localStorage.removeItem("crm.yo")}catch(x){}S.me=null;S.auth={state:"nouser",msg:e.msg}}
+    else if(!S.me)S.auth={state:"error",msg:e.msg||"No se ha podido conectar con el CRM."};
+    render()}}
+fromHash();
+(async()=>{
+  const ok=await initAuth();
+  if(!ok){render();return}
+  S.auth={state:"ok",msg:""};render();quienSoy();
+})();
+if("serviceWorker" in navigator&&location.protocol==="https:"){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+})();
+</script>
+</body>
+</html>
