@@ -492,7 +492,7 @@ function campoActivo(){return campoEnPantalla(document.activeElement)}
 function render(){
   if(campoActivo()){renderPend=true;return}
   renderPend=false;
-  renderBrand();renderNav();
+  renderBrand();if(S.me)renderNav();else $("#nav").innerHTML="";
   const app=$("#app");
   const A=S.auth.state;
   if(A==="setup"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>Falta configurar la app</h2><p>Hay que poner los datos del registro de Azure en el archivo config.js. Las instrucciones están en el README del repositorio.</p></div>';return}

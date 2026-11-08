@@ -1,6 +1,6 @@
 // Service worker del CRM: guarda la app para que abra rápido y sin conexión.
 // Nunca guarda datos de Odoo ni de Outlook: esas peticiones van siempre a la red.
-const VERSION = "crm-2026.11.07";
+const VERSION = "crm-2026.11.08";
 const SHELL = [
   "./", "./index.html", "./config.js", "./manifest.webmanifest",
   "./vendor/msal-browser.min.js",
