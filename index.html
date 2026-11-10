@@ -21,7 +21,7 @@
 /* Layout: imagen corporativa de Grupo Trimodos (como la calculadora del gasóleo): franja blanca con logotipos y raya tricolor
    (amarillo Trimodos, verde STINSA, naranja TRANSARGI), barra de título fija, contenido en una columna, cifras clave en negro
    con rótulos amarillos y barra inferior con el botón + en amarillo. El color de acento sigue a la empresa elegida. */
-:root{
+:root{--tl-ink:var(--ink);--tl-splash-bg:var(--bg);--tl-bg:color-mix(in srgb,var(--bg) 88%,transparent);--tl-fg:var(--ink);--tl-note:var(--muted);
   --bg:#f5f6f4; --surface:#ffffff; --sunk:#eceee9; --ink:#1d1d1b; --muted:#5f625c; --line:#dcdfd8;
   --accent:#00857a; --accent-ink:#ffffff; --accent-soft:#d9efec;
   --sun:#fcda00; --dark:#1d1d1b; --dark-ink:#ffffff; --dark-muted:#c9cac4; --dark-good:#5cc98d; --dark-bad:#f08a80;
@@ -296,6 +296,8 @@ body.lock{overflow:hidden}
 </style>
 </head>
 <body>
+<!-- Loader de marca: pantalla de inicio y cargas largas (ver trimodos-loader.js) -->
+<script src="trimodos-loader.js"></script>
 
 <div class="head" id="head"><div class="brand" id="brand"></div><header class="top" id="top"></header></div>
 <main id="app"><div class="skel"></div><div class="skel"></div><div class="skel"></div></main>
@@ -310,6 +312,8 @@ body.lock{overflow:hidden}
 // ---------- Estado ----------
 const VER="2026.11.07";
 const CONF=window.CRM_CONFIG||{};
+// Icono de carga de Grupo Trimodos para las esperas largas (Odoo, Outlook, Claude). Sin el script, vuelve a los esqueletos.
+const LOAD=(m,n)=>window.TrimodosLoader?TrimodosLoader.block(m):(m?'<p style="margin:4px 0 0;color:var(--muted);font-size:14px">'+m+'</p>':"")+'<div class="skel"></div>'.repeat(n||2);
 const CFG={empresas:["STINSA","TRANSARGI"],fixed:null,appName:"CRM comercial"};
 let savedEmp="";try{savedEmp=localStorage.getItem("crm.emp")||""}catch(e){}
 const S={cl:[],re:[],ac:[],op:[],kp:{},RAW:{cl:[],re:[],ac:[],op:[]},me:null,names:{},comerciales:[],cart:{},kpState:{},od:{state:"idle",msg:""},meName:"",
@@ -500,8 +504,8 @@ function render(){
   if(A==="nouser"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>No encontramos tu usuario de Odoo</h2><p>Has entrado como <b>'+esc(ACCOUNT?ACCOUNT.username:"")+'</b>, pero ese correo no coincide con ningún usuario de Odoo. Pide a quien administra el CRM que lo vincule (en n8n, «usuariosAlias»).</p><div class="btnrow"><button class="btn" data-act="retryYo">Reintentar</button><button class="btn ghost" data-act="logout">Entrar con otra cuenta</button></div></div>';return}
   if(A==="noemp"){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>Sin empresas del CRM</h2><p>Tu usuario de Odoo no tiene acceso a STINSA ni a TRANSARGI.</p><button class="btn ghost" data-act="logout">Salir</button></div>';return}
   if(A==="error"&&!S.me){setTop(CFG.appName);app.innerHTML='<div class="state login"><h2>No se puede entrar ahora</h2><p>'+esc(S.auth.msg)+'</p><div class="btnrow"><button class="btn" data-act="retryYo">Reintentar</button>'+(ACCOUNT?'<button class="btn ghost" data-act="logout">Salir</button>':'')+'</div></div>';return}
-  if(!S.me){setTop(CFG.appName);app.innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';return}
-  if(!S.RAW.cl.length&&(S.od.state==="loading"||S.od.state==="idle")){setTop(CFG.appName);app.innerHTML='<p style="margin:4px 0 0;color:var(--muted);font-size:14px">Cargando tus clientes de Odoo…</p><div class="skel"></div><div class="skel"></div><div class="skel"></div>';return}
+  if(!S.me){setTop(CFG.appName);app.innerHTML=LOAD("",3);return}
+  if(!S.RAW.cl.length&&(S.od.state==="loading"||S.od.state==="idle")){setTop(CFG.appName);app.innerHTML=LOAD("Cargando tus clientes de Odoo…",3);return}
   if(!S.RAW.cl.length&&S.od.state==="error"){setTop(CFG.appName);app.innerHTML='<div class="state"><h2>No se puede leer Odoo</h2><p>'+esc(S.od.msg)+'</p><button class="btn" data-act="reOdoo">Reintentar</button></div>';return}
   const slow=S.od.state==="error"?'<div class="banner"><b>No se ha podido actualizar desde Odoo.</b> '+esc(S.od.msg)+'</div>':"";
   const fn={hoy:vHoy,clientes:vClientes,agenda:vAgenda,cartera:vCartera,cliente:vCliente}[S.view]||vHoy;
@@ -572,7 +576,7 @@ function vCartera(){
   if(!A)cargarCartera(P.cur[0],P.cur.at(-1));if(!B)cargarCartera(P.prev[0],P.prev.at(-1));
   const opOpen=S.op.filter(o=>!/ganad|perdid/i.test(o.etapa||"")).sort((a,b)=>(+b.importe||0)-(+a.importe||0));
   let body;
-  if(!A||A.state==="loading")body='<p style="margin:0;color:var(--muted);font-size:14px">Calculando con Odoo… con periodos largos tarda unos segundos.</p><div class="skel"></div><div class="skel"></div>';
+  if(!A||A.state==="loading")body=LOAD("Calculando con Odoo… con periodos largos tarda unos segundos.");
   else if(A.state==="error")body='<div class="list"><div class="empty">'+esc(A.msg)+' <button class="btn small" data-act="reCart">Reintentar</button></div></div>';
   else{
     const enCl=new Set(S.cl.map(c=>c.id));const filtra=S.quien!=="todos";
@@ -649,7 +653,7 @@ function vCliente(){
    '<div class="quick">'+(telHref(c.movil||c.telefono)?'<a href="'+telHref(c.movil||c.telefono)+'">'+ic("phone")+'Llamar</a>':'<button data-act="noPhone">'+ic("phone")+'Llamar</button>')+(waHref(c.movil||c.telefono)?'<a href="'+waHref(c.movil||c.telefono,"Hola "+(c.contacto||"").split(" ")[0]+", ")+'" target="_blank" rel="noopener">'+ic("wa")+'WhatsApp</a>':'<button data-act="noPhone">'+ic("wa")+'WhatsApp</button>')+'<button data-act="mail">'+ic("mail")+'Correo</button><button data-act="newReunion">'+ic("meet")+'Reunión</button><button data-act="newAccion">'+ic("flag")+'Acción</button></div>'+
    '<div class="health '+hl[0]+'"><div><b>'+hl[1]+'</b>'+(h.reasons.length?'<ul>'+h.reasons.map(r=>'<li>'+esc(r)+'</li>').join("")+'</ul>':'Contacto reciente, facturación estable y próxima acción planificada.')+'</div></div>'+
    '</section>'+
-   (kst!=="ok"?'<section class="sec"><span class="eyebrow">Indicadores</span>'+(!kst?'<div class="ondemand"><p>Facturación, margen, servicios, cobros y gráfico de los últimos 24 meses. Se calculan en Odoo solo cuando los pides.</p><button class="btn" data-act="verKpis">'+ic("chart",' style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"')+'Ver indicadores</button></div>':kst==="loading"?'<p style="margin:0;color:var(--muted);font-size:14px">Calculando los indicadores en Odoo…</p><div class="skel"></div><div class="skel"></div>':'<div class="banner"><b>No se han podido leer los indicadores.</b> '+esc(kst.slice(6))+' <button class="btn small" data-act="reKpis">Reintentar</button></div>')+'</section>':
+   (kst!=="ok"?'<section class="sec"><span class="eyebrow">Indicadores</span>'+(!kst?'<div class="ondemand"><p>Facturación, margen, servicios, cobros y gráfico de los últimos 24 meses. Se calculan en Odoo solo cuando los pides.</p><button class="btn" data-act="verKpis">'+ic("chart",' style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"')+'Ver indicadores</button></div>':kst==="loading"?LOAD("Calculando los indicadores en Odoo…"):'<div class="banner"><b>No se han podido leer los indicadores.</b> '+esc(kst.slice(6))+' <button class="btn small" data-act="reKpis">Reintentar</button></div>')+'</section>':
    '<section class="sec"><span class="eyebrow">Indicadores · '+esc(P.label)+'</span>'+periodPicker()+
    '<div class="kpis">'+kpiLead("Facturación",a.ventas,b.ventas,P)+
    '<div class="kpi"><span class="l">Margen</span><span class="v num">'+pct(a.mpct)+'</span>'+delta(dlt(a.margen,b.margen))+(isFinite(a.estPct)&&a.estPct>0?'<span class="d flat">'+pct(a.estPct)+' del coste estimado</span>':'')+'</div>'+
@@ -730,7 +734,7 @@ function renderMail(){const box=$("#mailBox");if(!box||!S.mail)return;const M=S.
   if(!M.mode){
     h+='<div class="choose"><button data-act="mailNew">'+ic("cal")+'<div><b>Nuevo correo para pedir visita</b><span>Claude propone los días en los que tu Outlook está más libre</span></div></button></div>';
     h+='<div class="sec" style="margin-top:18px"><div class="sec-h"><span class="eyebrow">Últimos correos con el cliente</span>'+(M.state==="ok"?'<button class="link" data-act="mailReload">Actualizar</button>':"")+'</div><div class="list">';
-    if(M.state==="loading")h+='<div class="empty">Buscando en tu correo de Outlook…</div>';
+    if(M.state==="loading")h+=LOAD("Buscando en tu correo de Outlook…");
     else if(M.state!=="ok")h+='<div class="empty">'+esc(M.msg)+'</div>';
     else if(!M.list.length)h+='<div class="empty">No hay correos recientes con '+esc(domainOf(c.email)||c.email)+'.</div>';
     else h+=M.list.map((m,i)=>{const mine=/@grupotrimodos|@stinsa|@transargi/i.test(m.sender||"")||/^\/O=/i.test(m.sender||"");const d=String(m.receivedDateTime||m.sentDateTime||"").slice(0,10);
@@ -772,7 +776,8 @@ function ctxCliente(c){const re=S.re.filter(r=>r.clienteId===c.id&&r.fecha<=TODA
   return["Cliente: "+c.nombre.replace(/\s*\(ejemplo\)/i,""),"Sector: "+(c.sector||"-")+", "+(c.ciudad||""),"Contacto: "+(c.contacto||"-")+(c.cargo?" ("+c.cargo+")":""),
    re.length?"Últimas reuniones: "+re.map(r=>fDate(r.fecha)+": "+(r.resumen||"")+(r.resultado?" Resultado: "+r.resultado:"")).join(" | "):"Sin reuniones registradas",
    ac.length?"Acciones pendientes: "+ac.join("; "):"",op.length?"Oportunidades abiertas: "+op.join("; "):"",c.notas?"Notas: "+c.notas:""].filter(Boolean).join("\n")}
-async function genMail(){const M=S.mail;if(!M||M.gen==="busy")return;const c=cliente(M.cid);
+async function genMail(){const L=window.TrimodosLoader;if(L)L.show("Claude está redactando el correo…");try{return await genMail0()}finally{if(L)L.hide()}}
+async function genMail0(){const M=S.mail;if(!M||M.gen==="busy")return;const c=cliente(M.cid);
   M.gen="busy";M.genMsg="";renderMail();
   const firma=nombrePropio(S.meName);const fu=M.mode.kind==="fu";let orig="";
   if(fu){const m=M.mode.msg;orig="Asunto: "+(m.subject||"")+"\nDe: "+mailFrom(m)+"\nFecha: "+String(m.receivedDateTime||"").slice(0,10)+"\n";
@@ -883,7 +888,9 @@ async function cargarKpis(cid,fresh){const k=S.emp+"|"+cid;if(S.kpState[k]==="lo
     const c=S.RAW.cl.find(x=>x.id===String(cid));if(c){c.notas=fi.notas||"";c.contactos=fi.contactos||[]}S.fiState[k]="ok";
     S.kpState[k]="ok"}catch(e){S.kpState[k]="error:"+(e.msg||"")}
   if(!S.sheet)render()}
-async function save(col,id,data,merge){
+// Guardar en Odoo (y refrescar) enseña la capa de carga si tarda.
+async function save(...a){const L=window.TrimodosLoader,on=!!(L&&S.me);if(on)L.show("Guardando en Odoo…");try{return await save0(...a)}finally{if(on)L.hide()}}
+async function save0(col,id,data,merge){
   if(!S.me){toast("Entra con tu cuenta para guardar.");return false}
   const base={empresa:S.emp,user_login:S.me};let r;
   try{
